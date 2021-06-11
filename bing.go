@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	client *http.Client
+	client  *http.Client
 	headers []*Header
 )
 
@@ -88,15 +88,15 @@ func ScrapeBing(opts *Options) {
 
 	headers := make([]*Header, 3)
 	headers[0] = &Header{
-		Name: "accept-language",
+		Name:  "accept-language",
 		Value: "en-US,en;q=0.9,pl;q=0.8,fr;q=0.7,bn;q=0.6",
 	}
 	headers[1] = &Header{
-		Name: "user-agent",
+		Name:  "user-agent",
 		Value: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36",
 	}
 	headers[2] = &Header{
-		Name: "upgrade-insecure-requests",
+		Name:  "upgrade-insecure-requests",
 		Value: "1",
 	}
 
@@ -131,7 +131,7 @@ func ScrapeBing(opts *Options) {
 			panic(err)
 		}
 
-		doc.Find("a.iusc").Each(func (_ int, element *goquery.Selection) {
+		doc.Find("a.iusc").Each(func(_ int, element *goquery.Selection) {
 			rawInfo, exists := element.Attr("m")
 
 			if !exists {

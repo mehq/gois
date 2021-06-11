@@ -6,17 +6,17 @@ import (
 )
 
 type Header struct {
-	Name string
+	Name  string
 	Value string
 }
 
 type Options struct {
-	query string
+	query    string
 	explicit bool
-	gif bool
-	gray bool
-	height int
-	width int
+	gif      bool
+	gray     bool
+	height   int
+	width    int
 }
 
 func MakeUrl(baseUrl string, params *url.Values) string {
