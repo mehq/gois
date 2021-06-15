@@ -1,0 +1,28 @@
+dist: bionic
+
+language: go
+
+go:
+  - 1.16.x
+
+git:
+  depth: 1
+
+notifications:
+  email: false
+
+jobs:
+  include:
+    - stage: test
+      script:
+        - make check
+        - go mod verify
+        - make test
+#    - stage: build
+#      if: tag IS present
+#      script:
+#        - make build
+    - stage: report
+      if: branch = master
+      script:
+        - bash <(curl -s https://codecov.io/bash)

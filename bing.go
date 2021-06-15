@@ -1,39 +1,43 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
 	"github.com/PuerkitoBio/goquery"
 	"io"
 	"net/http"
-	"net/http/cookiejar"
 	"net/url"
 	"strings"
 )
 
-var (
-	client  *http.Client
-	headers []*Header
-)
+type bingInfoItem struct {
+	URL string `json:"murl"`
+}
 
-func makeFilterString(opts *Options) string {
+// Bing is used to scrape data from bing search engine.
+type Bing struct {
+	client *http.Client
+	opts   *Options
+}
+
+func (b Bing) makeFilterString() string {
 	filters := make([]string, 0)
 
-	if opts.gif {
+	if b.opts.gif {
 		filters = append(filters, "filterui:photo-animatedgif")
 	}
 
-	if opts.gray {
+	if b.opts.gray {
 		filters = append(filters, "filterui:color2-bw")
 	}
 
 	return strings.Join(filters, "+")
 }
 
-func defang(opts *Options) {
+func (b Bing) turnSafeSearchOff() {
 	params := &url.Values{}
-	params.Add("q", opts.query)
+	params.Set("q", b.opts.query)
 
-	res, err := client.Do(MakeRequest("GET", "https://www.bing.com/images/search", params, headers))
+	res, err := b.client.Do(MakeRequest("GET", "https://www.bing.com/images/search", params, nil))
 
 	if err != nil {
 		panic(err)
@@ -65,61 +69,40 @@ func defang(opts *Options) {
 	}
 
 	params.Del("q")
-	params.Add("pref_sbmt", "1")
-	params.Add("adlt_set", "off")
-	params.Add("adlt_confirm", "1")
-	params.Add("GUID", guid)
-	params.Add("is_child", "0")
-	params.Add("ru", ru)
+	params.Set("pref_sbmt", "1")
+	params.Set("adlt_set", "off")
+	params.Set("adlt_confirm", "1")
+	params.Set("GUID", guid)
+	params.Set("is_child", "0")
+	params.Set("ru", ru)
 
-	_, err = client.Do(MakeRequest("GET", "https://www.bing.com/settings.aspx", params, headers))
+	_, err = b.client.Do(MakeRequest("GET", "https://www.bing.com/settings.aspx", params, nil))
 
 	if err != nil {
 		panic(err)
 	}
 }
 
-func ScrapeBing(opts *Options) {
-	jar, err := cookiejar.New(nil)
-
-	if err != nil {
-		panic(err)
-	}
-
-	headers := make([]*Header, 3)
-	headers[0] = &Header{
-		Name:  "accept-language",
-		Value: "en-US,en;q=0.9,pl;q=0.8,fr;q=0.7,bn;q=0.6",
-	}
-	headers[1] = &Header{
-		Name:  "user-agent",
-		Value: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36",
-	}
-	headers[2] = &Header{
-		Name:  "upgrade-insecure-requests",
-		Value: "1",
-	}
-
-	client = &http.Client{
-		Jar: jar,
-	}
-
-	if opts.explicit {
-		defang(opts)
+// Scrape is the entrypoint.
+func (b Bing) Scrape() []string {
+	if !b.opts.safe {
+		b.turnSafeSearchOff()
 	}
 
 	params := &url.Values{}
-	params.Add("q", opts.query)
-	params.Add("first", "0")
-	params.Add("count", "150")
-	params.Add("relp", "150")
-	params.Add("qft", makeFilterString(opts))
+	params.Set("q", b.opts.query)
+	params.Set("first", "0")
+	params.Set("count", "150")
+	params.Set("relp", "150")
+	params.Set("qft", b.makeFilterString())
 
 	hasMore := true
+	itemCache := make(map[string]bool)
+	items := make([]string, 0)
 
 	for hasMore {
 		newCount := 0
-		res, err := client.Do(MakeRequest("GET", "https://www.bing.com/images/async", params, headers))
+		res, err := b.client.Do(MakeRequest("GET", "https://www.bing.com/images/async", params, nil))
 
 		if err != nil {
 			panic(err)
@@ -138,16 +121,26 @@ func ScrapeBing(opts *Options) {
 				panic("Does not exist")
 			}
 
-			fmt.Println(rawInfo)
-			newCount++
+			parsedInfo := &bingInfoItem{}
+
+			err = json.Unmarshal([]byte(rawInfo), parsedInfo)
+
+			if err != nil {
+				panic(err)
+			}
+
+			if !itemCache[parsedInfo.URL] {
+				items = append(items, parsedInfo.URL)
+				itemCache[parsedInfo.URL] = true
+				newCount++
+			}
 		})
 
-		err = res.Body.Close()
+		_ = res.Body.Close()
 
-		if err != nil {
-			panic(err)
-		}
-
-		hasMore = false
+		hasMore = newCount > 0
+		params.Set("first", Itoa(Atoi(params.Get("first"))+150))
 	}
+
+	return items
 }
