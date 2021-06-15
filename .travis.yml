@@ -18,11 +18,8 @@ jobs:
         - make check
         - go mod verify
         - make test
+        - if [ $TRAVIS_BRANCH == "master" && $TRAVIS_PULL_REQUEST == "false" ]; then bash <(curl -s https://codecov.io/bash); fi
 #    - stage: build
 #      if: tag IS present
 #      script:
 #        - make build
-    - stage: report
-      if: branch = master
-      script:
-        - bash <(curl -s https://codecov.io/bash)
