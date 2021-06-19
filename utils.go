@@ -113,7 +113,7 @@ func MakeProgressBarOutput(downloadStartedAt *time.Time, bw int64, sc int, fc in
 		elapsed := time.Since(*downloadStartedAt).Seconds()
 		speed = (float64(bw) / (1024.0 * 1024.0)) / elapsed
 	}
-	return fmt.Sprintf("Downloaded: %04d | Failed: %04d | Total: %04d | %3.3fMbps", sc, fc, rc, speed)
+	return fmt.Sprintf("Downloaded: %4d | Failed: %4d | Total: %4d | %7.3fMbps", sc, fc, rc, speed)
 }
 
 // MakeRequest is a utility function to make a new http.Request instance with
@@ -128,7 +128,9 @@ func MakeRequest(method, url string, params *url.Values, headers []*Header) *htt
 		panic(err)
 	}
 
-	req.URL.RawQuery = params.Encode()
+	if params != nil {
+		req.URL.RawQuery = params.Encode()
+	}
 
 	for _, v := range headers {
 		req.Header.Set(v.Name, v.Value)
