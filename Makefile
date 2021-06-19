@@ -1,15 +1,16 @@
-BINARY=gomage
-VERSION=0.0.1
-BUILD=`git rev-parse HEAD`
-PLATFORMS=darwin linux windows
-ARCHITECTURES=386 amd64
+BINARY = gomage
+VERSION = 0.0.1
+BUILD = `git rev-parse HEAD`
+
+PREFIX ?= /usr/local
+BINDIR ?= $(PREFIX)/bin
 
 # Setup linker flags option for build that interoperate with variable names in src code
 LDFLAGS=-ldflags "-X main.Version=${VERSION} -X main.Build=${BUILD}"
 
 .PHONY: all test build vendor
 
-all: build
+all: check test install clean
 
 build: ## Build project for current platform
 	mkdir -p build/bin
@@ -33,6 +34,10 @@ help: ## Show this help.
 		else if (/^## .*$$/) {printf "  ${CYAN}%s${RESET}\n", substr($$1,4)} \
 		}' $(MAKEFILE_LIST)
 
+install: build ## Build and install the program
+	install -d $(DESTDIR)$(BINDIR)
+	install -m 755 build/bin/$(BINARY) $(DESTDIR)$(BINDIR)
+
 test: ## Run tests
 	go test -v -race -coverprofile=coverage.txt -covermode=atomic -tags test
 
@@ -41,7 +46,3 @@ vendor:
 
 run: ## Run the program
 	go run .
-
-build_all: ## Build project for multiple platforms
-	$(foreach GOOS, $(PLATFORMS),\
-	$(foreach GOARCH, $(ARCHITECTURES), $(shell export GOOS=$(GOOS); export GOARCH=$(GOARCH); $(GO) build $(LDFLAGS) -mod vendor -o build/bin/$(BINARY)-$(GOOS)-$(GOARCH))))
