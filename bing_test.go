@@ -2,65 +2,66 @@ package main
 
 import (
 	"testing"
+	"time"
 )
 
-var optionTests = []Options{
-	{
-		query:  "cats",
-		safe:   true,
-		gif:    false,
-		gray:   false,
-		height: 0,
-		width:  0,
-	},
-	{
-		query:  "cats",
-		safe:   false,
-		gif:    false,
-		gray:   false,
-		height: 0,
-		width:  0,
-	},
-	{
-		query:  "cats",
-		safe:   true,
-		gif:    true,
-		gray:   false,
-		height: 0,
-		width:  0,
-	},
-	{
-		query:  "cats",
-		safe:   true,
-		gif:    false,
-		gray:   true,
-		height: 0,
-		width:  0,
-	},
-	{
-		query:  "cats",
-		safe:   true,
-		gif:    false,
-		gray:   false,
-		height: 1080,
-		width:  0,
-	},
-	{
-		query:  "cats",
-		safe:   true,
-		gif:    false,
-		gray:   false,
-		height: 0,
-		width:  1920,
-	},
-}
-
-func TestBingScrape(t *testing.T) {
+func TestBing_Scrape(t *testing.T) {
 	defer func() {
 		if r := recover(); r != nil {
-			t.Errorf("TestBingScrape() panicked")
+			t.Errorf("TestBing_Scrape() panicked")
 		}
 	}()
+
+	var optionTests = []Options{
+		{
+			query:  "cats",
+			safe:   true,
+			gif:    false,
+			gray:   false,
+			height: 0,
+			width:  0,
+		},
+		{
+			query:  "cats",
+			safe:   false,
+			gif:    false,
+			gray:   false,
+			height: 0,
+			width:  0,
+		},
+		{
+			query:  "cats",
+			safe:   true,
+			gif:    true,
+			gray:   false,
+			height: 0,
+			width:  0,
+		},
+		{
+			query:  "cats",
+			safe:   true,
+			gif:    false,
+			gray:   true,
+			height: 0,
+			width:  0,
+		},
+		{
+			query:  "cats",
+			safe:   true,
+			gif:    false,
+			gray:   false,
+			height: 1080,
+			width:  0,
+		},
+		{
+			query:  "cats",
+			safe:   true,
+			gif:    false,
+			gray:   false,
+			height: 0,
+			width:  1920,
+		},
+	}
 
 	client := MakeHTTPClient()
 
@@ -74,5 +75,7 @@ func TestBingScrape(t *testing.T) {
 		if len(items) < 1 {
 			t.Errorf("0 items scraped from bing")
 		}
+
+		time.Sleep(500 * time.Millisecond)
 	}
 }
