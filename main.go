@@ -199,7 +199,7 @@ func Produce(ch chan string, wg *sync.WaitGroup, rcUpdateMu *sync.Mutex, resultC
 func ProgressBar(wg *sync.WaitGroup, failCount, successCount, resultCount *int, bytesToDisk *int64, downloadStartedAt *time.Time) {
 	defer wg.Done()
 
-	for (*failCount + *successCount) != *resultCount || *resultCount < 0 {
+	for (*failCount+*successCount) != *resultCount || *resultCount < 0 {
 		time.Sleep(1500 * time.Millisecond)
 		out := MakeProgressBarOutput(downloadStartedAt, *bytesToDisk, *successCount, *failCount, *resultCount)
 		fmt.Printf("%s\r", out)
