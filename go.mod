@@ -1,4 +1,4 @@
-module github.com/mezba1/gomage
+module github.com/mzbaulhaque/gomage
 
 go 1.16
 
