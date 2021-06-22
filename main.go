@@ -5,12 +5,73 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
 	"runtime"
 	"sync"
 	"time"
 )
 
+var (
+	buildNumber    string
+	programVersion string
+	programName    string
+)
+
 func main() {
+	os.Exit(realMain())
+}
+
+func realMain() int {
+	help := flag.Bool("help", false, "Show this help output.")
+	safe := flag.Bool("safe", false, "Filter explicit images.")
+	gif := flag.Bool("gif", false, "a bool")
+	gray := flag.Bool("gray", false, "a bool")
+	version := flag.Bool("version", false, fmt.Sprintf("Show the current %s version.", programName))
+	height := flag.Int("height", 0, "a bool")
+	width := flag.Int("width", 0, "a bool")
+	wd := flag.String("chdir", "", "Switch to a different working directory before executing this program.")
+
+	flag.Parse()
+
+	tail := flag.Args()
+
+	if *help {
+		printUsage()
+		return 0
+	}
+
+	if *version {
+		printVersion()
+		return 0
+	}
+
+	tailLen := len(tail)
+
+	if tailLen < 1 {
+		panic("Missing query")
+	}
+
+	if tailLen > 1 {
+		panic("Too many queries")
+	}
+
+	if *wd != "" {
+		err := os.Chdir(*wd)
+
+		if err != nil {
+			return 1
+		}
+	}
+
+	opts := &Options{
+		query:  tail[0],
+		safe:   *safe,
+		gif:    *gif,
+		gray:   *gray,
+		height: *height,
+		width:  *width,
+	}
+
 	var bytesToDisk int64 = 0
 	var downloadStartedAt time.Time
 
@@ -18,40 +79,41 @@ func main() {
 	consumerWG := &sync.WaitGroup{}
 	failCount := 0
 	fcUpdateMu := &sync.Mutex{}
-	opts := MakeOptions()
 	producerClient := MakeHTTPClient()
 	producerWG := &sync.WaitGroup{}
 	progressWG := &sync.WaitGroup{}
 	rcUpdateMu := &sync.Mutex{}
 	resultChannel := make(chan string, 4096)
-	resultCount := 0
+	resultCount := -2
 	scUpdateMu := &sync.Mutex{}
 	successCount := 0
 
 	// Start progress hook
 	progressWG.Add(1)
-	go ProgressBar(progressWG, func() bool {
-		return (failCount + successCount) == resultCount
-	}, func() {
-		out := MakeProgressBarOutput(&downloadStartedAt, bytesToDisk, successCount, failCount, resultCount)
-		fmt.Printf("%s\r", out)
-	})
+	go ProgressBar(progressWG, &failCount, &successCount, &resultCount, &bytesToDisk, &downloadStartedAt)
 
 	// Start producers
 
 	// Bing
 	producerWG.Add(1)
-	go Produce(resultChannel, producerWG, func() []string {
+	go Produce(resultChannel, producerWG, rcUpdateMu, &resultCount, func() []string {
 		bing := Bing{
 			client: producerClient,
 			opts:   opts,
 		}
 
 		return bing.Scrape()
-	}, func(ic int) {
-		rcUpdateMu.Lock()
-		resultCount += ic
-		rcUpdateMu.Unlock()
+	})
+
+	// Google
+	producerWG.Add(1)
+	go Produce(resultChannel, producerWG, rcUpdateMu, &resultCount, func() []string {
+		google := Google{
+			client: producerClient,
+			opts:   opts,
+		}
+
+		return google.Scrape()
 	})
 
 	// Wait for producers to finish their jobs first
@@ -64,21 +126,7 @@ func main() {
 
 	for i := 0; i < runtime.NumCPU(); i++ {
 		consumerWG.Add(1)
-		go Consume(i, resultChannel, consumerWG, func(success bool, bw int64) {
-			if success {
-				scUpdateMu.Lock()
-				successCount++
-				scUpdateMu.Unlock()
-
-				btdUpdateMu.Lock()
-				bytesToDisk += bw
-				btdUpdateMu.Unlock()
-			} else {
-				fcUpdateMu.Lock()
-				failCount++
-				fcUpdateMu.Unlock()
-			}
-		})
+		go Consume(i, resultChannel, consumerWG, scUpdateMu, fcUpdateMu, btdUpdateMu, &failCount, &successCount, &bytesToDisk)
 	}
 
 	// Wait for consumers to finish
@@ -88,11 +136,22 @@ func main() {
 	progressWG.Wait()
 
 	fmt.Println("")
+
+	return 0
+}
+
+func printUsage() {
+	fmt.Printf("Usage: %s [options] query \n\nOptions:\n", programName)
+	flag.PrintDefaults()
+}
+
+func printVersion() {
+	fmt.Printf("%s %s, build %s\n", programName, programVersion, buildNumber)
 }
 
 // Consume is a consumer which reads from ch and downloads corresponding
 // image file.
-func Consume(cpuNum int, ch chan string, wg *sync.WaitGroup, updateCounters func(success bool, bw int64)) {
+func Consume(cpuNum int, ch chan string, wg *sync.WaitGroup, scUpdateMu, fcUpdateMu, btdUpdateMu *sync.Mutex, failCount, successCount *int, bytesToDisk *int64) {
 	defer wg.Done()
 
 	client := MakeHTTPClient()
@@ -101,52 +160,27 @@ func Consume(cpuNum int, ch chan string, wg *sync.WaitGroup, updateCounters func
 	for item := range ch {
 		outFilePath := fmt.Sprintf("%d-%d.jpg", cpuNum, consumeCount)
 		success, bytesWritten := Download(client, item, outFilePath)
-		updateCounters(success, bytesWritten)
+
+		if success {
+			scUpdateMu.Lock()
+			*successCount++
+			scUpdateMu.Unlock()
+
+			btdUpdateMu.Lock()
+			*bytesToDisk += bytesWritten
+			btdUpdateMu.Unlock()
+		} else {
+			fcUpdateMu.Lock()
+			*failCount++
+			fcUpdateMu.Unlock()
+		}
+
+		consumeCount++
 	}
-}
-
-// MakeOptions parses command line arguments into Options
-func MakeOptions() *Options {
-	//help := flag.Bool("help", false, "help text")
-	safe := flag.Bool("safe", true, "a bool")
-	gif := flag.Bool("gif", false, "a bool")
-	gray := flag.Bool("gray", false, "a bool")
-	height := flag.Int("height", 0, "a bool")
-	width := flag.Int("width", 0, "a bool")
-
-	flag.Parse()
-
-	tail := flag.Args()
-
-	//if *help {
-	//	flag.PrintDefaults()
-	//	os.Exit(0)
-	//}
-
-	tailLen := len(tail)
-
-	if tailLen < 1 {
-		panic("Missing query")
-	}
-
-	if tailLen > 1 {
-		panic("Too many queries")
-	}
-
-	opts := &Options{
-		query:  tail[0],
-		safe:   *safe,
-		gif:    *gif,
-		gray:   *gray,
-		height: *height,
-		width:  *width,
-	}
-
-	return opts
 }
 
 // Produce is a producer which scrapes data a source and writes to ch.
-func Produce(ch chan string, wg *sync.WaitGroup, getItems func() []string, updateCounters func(ic int)) {
+func Produce(ch chan string, wg *sync.WaitGroup, rcUpdateMu *sync.Mutex, resultCount *int, getItems func() []string) {
 	defer wg.Done()
 
 	items := getItems()
@@ -155,16 +189,19 @@ func Produce(ch chan string, wg *sync.WaitGroup, getItems func() []string, updat
 		ch <- item
 	}
 
-	updateCounters(len(items))
+	rcUpdateMu.Lock()
+	*resultCount += len(items) + 1
+	rcUpdateMu.Unlock()
 }
 
 // ProgressBar is responsible to output relevant information regarding
 // this program.
-func ProgressBar(wg *sync.WaitGroup, shouldContinue func() bool, hook func()) {
+func ProgressBar(wg *sync.WaitGroup, failCount, successCount, resultCount *int, bytesToDisk *int64, downloadStartedAt *time.Time) {
 	defer wg.Done()
 
-	for shouldContinue() {
+	for (*failCount + *successCount) != *resultCount || *resultCount < 0 {
 		time.Sleep(1500 * time.Millisecond)
-		hook()
+		out := MakeProgressBarOutput(downloadStartedAt, *bytesToDisk, *successCount, *failCount, *resultCount)
+		fmt.Printf("%s\r", out)
 	}
 }
