@@ -1,26 +1,26 @@
-BINARY = gomage
-VERSION = 0.0.1
-BUILD = `git rev-parse HEAD`
-
+GOCMD ?= go
+GOBUILD = $(GOCMD) build -v
+GOCLEAN = $(GOCMD) clean -v
+GOTEST = $(GOCMD) test -v
 PREFIX ?= /usr/local
 BINDIR ?= $(PREFIX)/bin
+BINARY_NAME = gomage
 
-# Setup linker flags option for build that interoperate with variable names in src code
-LDFLAGS=-ldflags "-X main.Version=${VERSION} -X main.Build=${BUILD}"
+BUILD ?= $(shell git rev-list HEAD --count)
+VERSION ?= $(shell git describe --tags --abbrev=0 2>/dev/null)
+LDFLAGS = -ldflags "-X main.buildNumber=${BUILD} -X main.programVersion=${VERSION} -X main.programName=${BINARY_NAME}"
 
-.PHONY: all test build vendor
-
-all: check test install clean
+all: test build
 
 build: ## Build project for current platform
-	mkdir -p build/bin
-	GO111MODULE=on go build $(LDFLAGS) -mod vendor -o build/bin/$(BINARY) .
+	$(GOBUILD) $(LDFLAGS) -mod vendor -o dist/$(BINARY_NAME) .
 
 check: ## Check source code issues
 	bash scripts/gocheck.sh
 
 clean: ## Remove build/ci related file
-	rm -fr ./build
+	$(GOCLEAN)
+	rm -fr ./dist
 	rm coverage.txt
 
 help: ## Show this help.
@@ -36,13 +36,7 @@ help: ## Show this help.
 
 install: build ## Build and install the program
 	install -d $(DESTDIR)$(BINDIR)
-	install -m 755 build/bin/$(BINARY) $(DESTDIR)$(BINDIR)
+	install -m 755 dist/$(BINARY_NAME) $(DESTDIR)$(BINDIR)
 
 test: ## Run tests
-	go test -v -race -coverprofile=coverage.txt -covermode=atomic -tags test
-
-vendor:
-	go mod vendor
-
-run: ## Run the program
-	go run .
+	$(GOTEST) -race -coverprofile=coverage.txt -covermode=atomic -tags test
