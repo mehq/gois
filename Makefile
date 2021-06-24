@@ -1,42 +1,65 @@
 GOCMD ?= go
-GOBUILD = $(GOCMD) build -v
-GOCLEAN = $(GOCMD) clean -v
-GOTEST = $(GOCMD) test -v
-PREFIX ?= /usr/local
-BINDIR ?= $(PREFIX)/bin
-BINARY_NAME = gomage
+GOPATH ?= $(shell go env GOPATH)
+GOBIN ?= $(firstword $(subst :, ,${GOPATH}))/bin
 
-BUILD ?= $(shell git rev-list HEAD --count)
-VERSION ?= $(shell git describe --tags --abbrev=0 2>/dev/null)
-LDFLAGS = -ldflags "-X main.buildNumber=${BUILD} -X main.programVersion=${VERSION} -X main.programName=${BINARY_NAME}"
+GO111MODULE ?= on
+export GO111MODULE
+GOPROXY ?= https://proxy.golang.org
+export GOPROXY
+
+DIST_DIR = dist
+BINARY_NAME = gomage
+BUILD_NUMBER ?= $(shell git rev-list HEAD --count)
+VERSION ?= $(shell cat VERSION)
+LDFLAGS = -ldflags "-X main.buildNumber=${BUILD_NUMBER} -X main.programVersion=${VERSION} -X main.programName=${BINARY_NAME}"
 
 all: test build
 
-build: ## Build project for current platform
-	$(GOBUILD) $(LDFLAGS) -mod vendor -o dist/$(BINARY_NAME) .
+build: ## Build for current platform
+	@$(GOCMD) build $(LDFLAGS) -o $(DIST_DIR)/$(BINARY_NAME)
 
-check: ## Check source code issues
-	bash scripts/gocheck.sh
+check: deps ## Check source code issues
+	@bash scripts/gocheck.sh
 
 clean: ## Remove build/ci related file
-	$(GOCLEAN)
-	rm -fr ./dist
-	rm coverage.txt
+	@$(GOCMD) clean
+	@rm -fr ./dist ||:
+	@rm coverage.txt ||:
 
-help: ## Show this help.
-	@echo ''
-	@echo 'Usage:'
-	@echo '  ${YELLOW}make${RESET} ${GREEN}<target>${RESET}'
+crossbuild: ## Build for multiple platforms
+	@GOOS=darwin GOARCH=amd64 $(GOCMD) build $(LDFLAGS) -o $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).darwin-amd64/$(BINARY_NAME)
+	@GOOS=freebsd GOARCH=amd64 $(GOCMD) build $(LDFLAGS) -o $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).freebsd-amd64/$(BINARY_NAME)
+	@GOOS=linux GOARCH=amd64 $(GOCMD) build $(LDFLAGS) -o $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).linux-amd64/$(BINARY_NAME)
+	@GOOS=linux GOARCH=arm64 $(GOCMD) build $(LDFLAGS) -o $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).linux-arm64/$(BINARY_NAME)
+	@GOOS=windows GOARCH=amd64 $(GOCMD) build $(LDFLAGS) -o $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).windows-amd64/$(BINARY_NAME).exe
+
+deps: ## Ensures fresh go.mod and go.sum.
+	@$(GOCMD) mod tidy
+	@$(GOCMD) mod verify
+
+help: ## Show this help
+	@echo 'Usage: make [target]'
 	@echo ''
 	@echo 'Targets:'
 	@awk 'BEGIN {FS = ":.*?## "} { \
-		if (/^[a-zA-Z_-]+:.*?##.*$$/) {printf "    ${YELLOW}%-20s${GREEN}%s${RESET}\n", $$1, $$2} \
-		else if (/^## .*$$/) {printf "  ${CYAN}%s${RESET}\n", substr($$1,4)} \
+		if (/^[a-zA-Z_-]+:.*?##.*$$/) {printf "    %-20s%s\n", $$1, $$2} \
+		else if (/^## .*$$/) {printf "  %s\n", substr($$1,4)} \
 		}' $(MAKEFILE_LIST)
 
-install: build ## Build and install the program
-	install -d $(DESTDIR)$(BINDIR)
-	install -m 755 dist/$(BINARY_NAME) $(DESTDIR)$(BINDIR)
+install: ## Install the program
+	@GOBIN=$(GOBIN) $(GOCMD) install -v $(LDFLAGS)
+
+release: clean crossbuild ## Build release artifacts
+	@cp CHANGELOG.md LICENSE.txt README.md $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).darwin-amd64/
+	@cp CHANGELOG.md LICENSE.txt README.md $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).freebsd-amd64/
+	@cp CHANGELOG.md LICENSE.txt README.md $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).linux-amd64/
+	@cp CHANGELOG.md LICENSE.txt README.md $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).linux-arm64/
+	@cp CHANGELOG.md LICENSE.txt README.md $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).windows-amd64/
+	@cd $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).darwin-amd64/; tar -zcf ../$(BINARY_NAME)-$(VERSION).darwin-amd64.tar.gz *
+	@cd $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).freebsd-amd64/; tar -zcf ../$(BINARY_NAME)-$(VERSION).freebsd-amd64.tar.gz *
+	@cd $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).linux-amd64/; tar -zcf ../$(BINARY_NAME)-$(VERSION).linux-amd64.tar.gz *
+	@cd $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).linux-arm64/; tar -zcf ../$(BINARY_NAME)-$(VERSION).linux-arm64.tar.gz *
+	@cd $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).windows-amd64/; tar -zcf ../$(BINARY_NAME)-$(VERSION).windows-amd64.tar.gz *
 
 test: ## Run tests
-	$(GOTEST) -race -coverprofile=coverage.txt -covermode=atomic -tags test
+	@$(GOCMD) test -v -race -coverprofile=coverage.txt -covermode=atomic -tags test
