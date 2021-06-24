@@ -1,0 +1,19 @@
+name: Release
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  release:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go 1.16
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.16'
+      - name: Make release assets
+        run: make release
+      - name: Upload release assets
+        run: GH_ACCESS_TOKEN=${{ secrets.GH_ACCESS_TOKEN }} bash scripts/upload.sh
