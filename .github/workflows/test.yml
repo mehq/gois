@@ -1,4 +1,4 @@
-name: Test push on master and upload coverage report
+name: Test
 
 on:
   push:

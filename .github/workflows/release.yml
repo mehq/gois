@@ -1,8 +1,9 @@
 name: Release
 
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   release:
@@ -13,7 +14,10 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: '1.16'
+      - name: Set tag
+        id: vars
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
       - name: Make release assets
-        run: make release
-      - name: Upload release assets
-        run: GH_ACCESS_TOKEN=${{ secrets.GH_ACCESS_TOKEN }} bash scripts/upload.sh
+        run: VERSION=${{ steps.vars.outputs.tag }} make release
+      - name: Create release
+        run: GH_ACCESS_TOKEN=${{ secrets.GH_ACCESS_TOKEN }} bash scripts/gh-release.sh ${{ steps.vars.outputs.tag }}
