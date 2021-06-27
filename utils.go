@@ -20,12 +20,13 @@ type Header struct {
 // Options is collection of option used by scrapers to find specific
 // data.
 type Options struct {
-	query  string
-	safe   bool
-	gif    bool
-	gray   bool
-	height int
-	width  int
+	query    string
+	safe     bool
+	gif      bool
+	gray     bool
+	height   int
+	width    int
+	testMode bool
 }
 
 var defaultHeaders = []*Header{
