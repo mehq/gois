@@ -1,4 +1,4 @@
-[![CI](https://github.com/mzbaulhaque/gomage/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/mzbaulhaque/gomage/actions/workflows/ci.yml)
+[![CI](https://github.com/mzbaulhaque/gomage/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/mzbaulhaque/gomage/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/mzbaulhaque/gomage/branch/master/graph/badge.svg)](https://codecov.io/gh/mzbaulhaque/gomage)
 
 **gomage** - CLI program to search and download images in bulk
