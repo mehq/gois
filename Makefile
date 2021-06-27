@@ -10,7 +10,7 @@ export GOPROXY
 DIST_DIR = dist
 BINARY_NAME = gomage
 BUILD_NUMBER ?= $(shell git rev-list HEAD --count)
-VERSION ?= $(shell cat VERSION)
+VERSION ?= X.X.X
 LDFLAGS = -ldflags "-X main.buildNumber=${BUILD_NUMBER} -X main.programVersion=${VERSION} -X main.programName=${BINARY_NAME}"
 
 all: test build
@@ -50,11 +50,11 @@ install: ## Install the program
 	@GOBIN=$(GOBIN) $(GOCMD) install -v $(LDFLAGS)
 
 release: clean crossbuild ## Build release artifacts
-	@cp CHANGELOG.md LICENSE.txt README.md $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).darwin-amd64/
-	@cp CHANGELOG.md LICENSE.txt README.md $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).freebsd-amd64/
-	@cp CHANGELOG.md LICENSE.txt README.md $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).linux-amd64/
-	@cp CHANGELOG.md LICENSE.txt README.md $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).linux-arm64/
-	@cp CHANGELOG.md LICENSE.txt README.md $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).windows-amd64/
+	@cp CHANGELOG.md LICENSE README.md $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).darwin-amd64/
+	@cp CHANGELOG.md LICENSE README.md $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).freebsd-amd64/
+	@cp CHANGELOG.md LICENSE README.md $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).linux-amd64/
+	@cp CHANGELOG.md LICENSE README.md $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).linux-arm64/
+	@cp CHANGELOG.md LICENSE README.md $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).windows-amd64/
 	@cd $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).darwin-amd64/; tar -zcf ../$(BINARY_NAME)-$(VERSION).darwin-amd64.tar.gz *
 	@cd $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).freebsd-amd64/; tar -zcf ../$(BINARY_NAME)-$(VERSION).freebsd-amd64.tar.gz *
 	@cd $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).linux-amd64/; tar -zcf ../$(BINARY_NAME)-$(VERSION).linux-amd64.tar.gz *
