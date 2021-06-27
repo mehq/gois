@@ -1,8 +1,9 @@
-name: Test push on master and upload coverage report
+name: Test pull requests against develop or master
 
 on:
-  push:
+  pull_request:
     branches:
+      - develop
       - master
 
 jobs:
@@ -14,7 +15,9 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: '1.16'
+      - name: Run checks
+        run: make check
       - name: Run tests
         run: make test
-      - name: Upload coverage report
-        run: bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN }}
+      - name: Build
+        run: make build
