@@ -23,13 +23,13 @@ func main() {
 
 func realMain() int {
 	help := flag.Bool("help", false, "Show this help output.")
-	safe := flag.Bool("safe", false, "Filter explicit images.")
-	gif := flag.Bool("gif", false, "a bool")
-	gray := flag.Bool("gray", false, "a bool")
+	safe := flag.Bool("safe", false, "Filter explicit images. [1]")
+	gif := flag.Bool("gif", false, "Download only gif images. [1]")
+	gray := flag.Bool("gray", false, "Download only black and white images. [1]")
 	version := flag.Bool("version", false, fmt.Sprintf("Show the current %s version.", programName))
-	height := flag.Int("height", 0, "a bool")
-	width := flag.Int("width", 0, "a bool")
-	wd := flag.String("chdir", "", "Switch to a different working directory before executing this program.")
+	height := flag.Int("height", 0, "Download images with given height (width must be provided as well). [1]")
+	width := flag.Int("width", 0, "Download images with given width (height must be provided as well). [1]")
+	wd := flag.String("chdir", "", "Switch to given directory before executing this program.")
 
 	flag.Parse()
 
@@ -55,6 +55,10 @@ func realMain() int {
 		panic("Too many queries")
 	}
 
+	if *width < 0 || *height < 0 {
+		panic("Invalid width or height given")
+	}
+
 	if *wd != "" {
 		err := os.Chdir(*wd)
 
@@ -64,12 +68,13 @@ func realMain() int {
 	}
 
 	opts := &Options{
-		query:  tail[0],
-		safe:   *safe,
-		gif:    *gif,
-		gray:   *gray,
-		height: *height,
-		width:  *width,
+		query:    tail[0],
+		safe:     *safe,
+		gif:      *gif,
+		gray:     *gray,
+		height:   *height,
+		width:    *width,
+		testMode: false,
 	}
 
 	var bytesToDisk int64 = 0
@@ -143,6 +148,8 @@ func realMain() int {
 func printUsage() {
 	fmt.Printf("Usage: %s [options] query \n\nOptions:\n", programName)
 	flag.PrintDefaults()
+	fmt.Printf("\n[1] It is not guaranteed that these filters would always act as described. ")
+	fmt.Println("Their behavior depends on search engine.")
 }
 
 func printVersion() {
