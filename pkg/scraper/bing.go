@@ -1,9 +1,10 @@
-package main
+package scraper
 
 import (
 	"encoding/json"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/mzbaulhaque/gomage/internal"
 	"io"
 	"net/http"
 	"net/url"
@@ -16,24 +17,24 @@ type bingInfoItem struct {
 
 // Bing is used to scrape data from bing search engine.
 type Bing struct {
-	client *http.Client
-	opts   *Options
+	Client *http.Client
+	Opts   *internal.Options
 }
 
 func (b Bing) makeFilterString() string {
 	filters := make([]string, 0)
 
-	if b.opts.gif {
+	if b.Opts.Gif {
 		filters = append(filters, "filterui:photo-animatedgif")
 	}
 
-	if b.opts.gray {
+	if b.Opts.Gray {
 		filters = append(filters, "filterui:color2-bw")
 	}
 
-	if b.opts.height > 0 && b.opts.width > 0 {
+	if b.Opts.Height > 0 && b.Opts.Width > 0 {
 		fmt.Println("setting height")
-		filters = append(filters, fmt.Sprintf("filterui:imagesize-custom_%d_%d", b.opts.width, b.opts.height))
+		filters = append(filters, fmt.Sprintf("filterui:imagesize-custom_%d_%d", b.Opts.Width, b.Opts.Height))
 	}
 
 	return strings.Join(filters, "+")
@@ -41,9 +42,9 @@ func (b Bing) makeFilterString() string {
 
 func (b Bing) turnSafeSearchOff() {
 	params := &url.Values{}
-	params.Set("q", b.opts.query)
+	params.Set("q", b.Opts.Query)
 
-	res, err := b.client.Do(MakeRequest("GET", "https://www.bing.com/images/search", params, nil))
+	res, err := b.Client.Do(internal.MakeRequest("GET", "https://www.bing.com/images/search", params, nil))
 
 	if err != nil {
 		panic(err)
@@ -82,7 +83,7 @@ func (b Bing) turnSafeSearchOff() {
 	params.Set("is_child", "0")
 	params.Set("ru", ru)
 
-	_, err = b.client.Do(MakeRequest("GET", "https://www.bing.com/settings.aspx", params, nil))
+	_, err = b.Client.Do(internal.MakeRequest("GET", "https://www.bing.com/settings.aspx", params, nil))
 
 	if err != nil {
 		panic(err)
@@ -91,12 +92,12 @@ func (b Bing) turnSafeSearchOff() {
 
 // Scrape is the entrypoint.
 func (b Bing) Scrape() []string {
-	if !b.opts.safe {
+	if !b.Opts.Safe {
 		b.turnSafeSearchOff()
 	}
 
 	params := &url.Values{}
-	params.Set("q", b.opts.query)
+	params.Set("q", b.Opts.Query)
 	params.Set("first", "0")
 	params.Set("count", "150")
 	params.Set("relp", "150")
@@ -108,7 +109,7 @@ func (b Bing) Scrape() []string {
 
 	for hasMore {
 		newCount := 0
-		res, err := b.client.Do(MakeRequest("GET", "https://www.bing.com/images/async", params, nil))
+		res, err := b.Client.Do(internal.MakeRequest("GET", "https://www.bing.com/images/async", params, nil))
 
 		if err != nil {
 			panic(err)
@@ -144,12 +145,12 @@ func (b Bing) Scrape() []string {
 
 		_ = res.Body.Close()
 
-		if b.opts.testMode {
+		if b.Opts.TestMode {
 			break
 		}
 
 		hasMore = newCount > 0
-		params.Set("first", Itoa(Atoi(params.Get("first"))+150))
+		params.Set("first", internal.Itoa(internal.Atoi(params.Get("first"))+150))
 	}
 
 	return items

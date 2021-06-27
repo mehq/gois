@@ -5,6 +5,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/mzbaulhaque/gomage/internal"
+	"github.com/mzbaulhaque/gomage/pkg/scraper"
 	"os"
 	"runtime"
 	"sync"
@@ -67,14 +69,14 @@ func realMain() int {
 		}
 	}
 
-	opts := &Options{
-		query:    tail[0],
-		safe:     *safe,
-		gif:      *gif,
-		gray:     *gray,
-		height:   *height,
-		width:    *width,
-		testMode: false,
+	opts := &internal.Options{
+		Query:    tail[0],
+		Safe:     *safe,
+		Gif:      *gif,
+		Gray:     *gray,
+		Height:   *height,
+		Width:    *width,
+		TestMode: false,
 	}
 
 	var bytesToDisk int64 = 0
@@ -84,7 +86,7 @@ func realMain() int {
 	consumerWG := &sync.WaitGroup{}
 	failCount := 0
 	fcUpdateMu := &sync.Mutex{}
-	producerClient := MakeHTTPClient()
+	producerClient := internal.MakeHTTPClient()
 	producerWG := &sync.WaitGroup{}
 	progressWG := &sync.WaitGroup{}
 	rcUpdateMu := &sync.Mutex{}
@@ -102,9 +104,9 @@ func realMain() int {
 	// Bing
 	producerWG.Add(1)
 	go Produce(resultChannel, producerWG, rcUpdateMu, &resultCount, func() []string {
-		bing := Bing{
-			client: producerClient,
-			opts:   opts,
+		bing := scraper.Bing{
+			Client: producerClient,
+			Opts:   opts,
 		}
 
 		return bing.Scrape()
@@ -113,9 +115,9 @@ func realMain() int {
 	// Google
 	producerWG.Add(1)
 	go Produce(resultChannel, producerWG, rcUpdateMu, &resultCount, func() []string {
-		google := Google{
-			client: producerClient,
-			opts:   opts,
+		google := scraper.Google{
+			Client: producerClient,
+			Opts:   opts,
 		}
 
 		return google.Scrape()
@@ -161,12 +163,12 @@ func printVersion() {
 func Consume(cpuNum int, ch chan string, wg *sync.WaitGroup, scUpdateMu, fcUpdateMu, btdUpdateMu *sync.Mutex, failCount, successCount *int, bytesToDisk *int64) {
 	defer wg.Done()
 
-	client := MakeHTTPClient()
+	client := internal.MakeHTTPClient()
 	consumeCount := 0
 
 	for item := range ch {
 		outFilePath := fmt.Sprintf("%d-%d.jpg", cpuNum, consumeCount)
-		success, bytesWritten := Download(client, item, outFilePath)
+		success, bytesWritten := internal.Download(client, item, outFilePath)
 
 		if success {
 			scUpdateMu.Lock()
@@ -208,7 +210,7 @@ func ProgressBar(wg *sync.WaitGroup, failCount, successCount, resultCount *int, 
 
 	for (*failCount+*successCount) != *resultCount || *resultCount < 0 {
 		time.Sleep(1500 * time.Millisecond)
-		out := MakeProgressBarOutput(downloadStartedAt, *bytesToDisk, *successCount, *failCount, *resultCount)
+		out := internal.MakeProgressBarOutput(downloadStartedAt, *bytesToDisk, *successCount, *failCount, *resultCount)
 		fmt.Printf("%s\r", out)
 	}
 }

@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"fmt"
@@ -20,13 +20,13 @@ type Header struct {
 // Options is collection of option used by scrapers to find specific
 // data.
 type Options struct {
-	query    string
-	safe     bool
-	gif      bool
-	gray     bool
-	height   int
-	width    int
-	testMode bool
+	Query    string
+	Safe     bool
+	Gif      bool
+	Gray     bool
+	Height   int
+	Width    int
+	TestMode bool
 }
 
 var defaultHeaders = []*Header{

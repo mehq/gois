@@ -1,4 +1,9 @@
-.idea/
-dist/
+/.build
+/.idea
+/.release
+/.tarballs
+/vendor
+.DS_Store
 coverage.txt
+/gomage
 testfile.html

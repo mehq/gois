@@ -1,9 +1,10 @@
-package main
+package scraper
 
 import (
 	"encoding/json"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/mzbaulhaque/gomage/internal"
 	"net/http"
 	"net/url"
 	"strings"
@@ -11,8 +12,8 @@ import (
 
 // Google is used to scrape data from google search engine.
 type Google struct {
-	client *http.Client
-	opts   *Options
+	Client *http.Client
+	Opts   *internal.Options
 }
 
 type googleInfoItem struct {
@@ -22,18 +23,18 @@ type googleInfoItem struct {
 func (g Google) makeFilterString() string {
 	filters := make([]string, 0)
 
-	if g.opts.gif {
+	if g.Opts.Gif {
 		filters = append(filters, "ift:gif")
 	}
 
-	if g.opts.gray {
+	if g.Opts.Gray {
 		filters = append(filters, "ic:gray")
 	}
 
-	if g.opts.height > 0 && g.opts.width > 0 {
+	if g.Opts.Height > 0 && g.Opts.Width > 0 {
 		filters = append(filters, "isz:ex")
-		filters = append(filters, fmt.Sprintf("iszh:%d", g.opts.height))
-		filters = append(filters, fmt.Sprintf("iszw:%d", g.opts.width))
+		filters = append(filters, fmt.Sprintf("iszh:%d", g.Opts.Height))
+		filters = append(filters, fmt.Sprintf("iszw:%d", g.Opts.Width))
 	}
 
 	return strings.Join(filters, ",")
@@ -46,12 +47,12 @@ func (g Google) Scrape() []string {
 	params.Set("asearch", "ichunk")
 	params.Set("ijn", "0")
 	params.Set("start", "0")
-	params.Set("q", g.opts.query)
+	params.Set("q", g.Opts.Query)
 	params.Set("hl", "en")
 	params.Set("async", "_id:rg_s,_pms:s,_fmt:pc")
 	params.Set("tbs", g.makeFilterString())
 
-	if g.opts.safe {
+	if g.Opts.Safe {
 		params.Set("safe", "active")
 	} else {
 		params.Set("safe", "images")
@@ -63,7 +64,7 @@ func (g Google) Scrape() []string {
 
 	for hasMore {
 		newCount := 0
-		res, err := g.client.Do(MakeRequest("GET", "https://www.google.com/search", params, nil))
+		res, err := g.Client.Do(internal.MakeRequest("GET", "https://www.google.com/search", params, nil))
 
 		if err != nil {
 			panic(err)
@@ -93,13 +94,13 @@ func (g Google) Scrape() []string {
 
 		_ = res.Body.Close()
 
-		if g.opts.testMode {
+		if g.Opts.TestMode {
 			break
 		}
 
 		hasMore = newCount > 0
-		params.Set("ijn", Itoa(Atoi(params.Get("ijn"))+1))
-		params.Set("start", Itoa(Atoi(params.Get("ijn"))*100))
+		params.Set("ijn", internal.Itoa(internal.Atoi(params.Get("ijn"))+1))
+		params.Set("start", internal.Itoa(internal.Atoi(params.Get("ijn"))*100))
 	}
 
 	return items

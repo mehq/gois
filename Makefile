@@ -10,8 +10,9 @@ export GOPROXY
 DIST_DIR = dist
 BINARY_NAME = gomage
 BUILD_NUMBER ?= $(shell git rev-list HEAD --count)
-VERSION ?= X.X.X
-LDFLAGS = -ldflags "-X main.buildNumber=${BUILD_NUMBER} -X main.programVersion=${VERSION} -X main.programName=${BINARY_NAME}"
+TAG ?= vX.X.X
+VERSION = $(TAG:v%=%)
+LDFLAGS = -ldflags "-X main.buildNumber=${BUILD_NUMBER} -X main.programVersion=${VERSION} -X main.programName=${BINARY_NAME} -X main.programPlatform=${}"
 
 all: test build
 
