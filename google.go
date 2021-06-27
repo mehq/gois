@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"net/http"
 	"net/url"
@@ -27,6 +28,12 @@ func (g Google) makeFilterString() string {
 
 	if g.opts.gray {
 		filters = append(filters, "ic:gray")
+	}
+
+	if g.opts.height > 0 && g.opts.width > 0 {
+		filters = append(filters, "isz:ex")
+		filters = append(filters, fmt.Sprintf("iszh:%d", g.opts.height))
+		filters = append(filters, fmt.Sprintf("iszw:%d", g.opts.width))
 	}
 
 	return strings.Join(filters, ",")
@@ -85,6 +92,11 @@ func (g Google) Scrape() []string {
 		})
 
 		_ = res.Body.Close()
+
+		if g.opts.testMode {
+			break
+		}
+
 		hasMore = newCount > 0
 		params.Set("ijn", Itoa(Atoi(params.Get("ijn"))+1))
 		params.Set("start", Itoa(Atoi(params.Get("ijn"))*100))
