@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"testing"
 	"time"
 )
@@ -31,6 +32,19 @@ func TestAtoi(t *testing.T) {
 		if test.out != got {
 			t.Errorf("Atoi invalid output %d for input %s, expected %d", got, test.in, test.out)
 		}
+	}
+}
+
+func TestDownload(t *testing.T) {
+	client := MakeHTTPClient()
+	success, bw := Download(client, "https://example.com", "testfile.html")
+
+	if !success || bw < 1 {
+		t.Errorf("Error encountered while downloading file.")
+	}
+
+	if _, err := os.Stat("testfile.html"); os.IsNotExist(err) {
+		t.Errorf("Error encountered while downloading file. File not written to disk.")
 	}
 }
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"io"
 	"net/http"
@@ -28,6 +29,11 @@ func (b Bing) makeFilterString() string {
 
 	if b.opts.gray {
 		filters = append(filters, "filterui:color2-bw")
+	}
+
+	if b.opts.height > 0 && b.opts.width > 0 {
+		fmt.Println("setting height")
+		filters = append(filters, fmt.Sprintf("filterui:imagesize-custom_%d_%d", b.opts.width, b.opts.height))
 	}
 
 	return strings.Join(filters, "+")
@@ -137,6 +143,10 @@ func (b Bing) Scrape() []string {
 		})
 
 		_ = res.Body.Close()
+
+		if b.opts.testMode {
+			break
+		}
 
 		hasMore = newCount > 0
 		params.Set("first", Itoa(Atoi(params.Get("first"))+150))

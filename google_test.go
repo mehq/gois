@@ -5,10 +5,10 @@ import (
 	"time"
 )
 
-func TestBing_Scrape(t *testing.T) {
+func TestGoogle_Scrape(t *testing.T) {
 	defer func() {
 		if r := recover(); r != nil {
-			t.Errorf("TestBing_Scrape() panicked")
+			t.Errorf("TestGoogle_Scrape() panicked")
 		}
 	}()
 
@@ -54,14 +54,14 @@ func TestBing_Scrape(t *testing.T) {
 	client := MakeHTTPClient()
 
 	for _, test := range optionTests {
-		bing := Bing{
+		google := Google{
 			client: client,
 			opts:   &test,
 		}
-		items := bing.Scrape()
+		items := google.Scrape()
 
 		if len(items) < 1 {
-			t.Errorf("0 items scraped from bing")
+			t.Errorf("0 items scraped from google")
 		}
 
 		time.Sleep(500 * time.Millisecond)
