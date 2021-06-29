@@ -1,0 +1,20 @@
+linters:
+  enable:
+    - asciicheck
+    - depguard
+    - gocognit
+    - goconst
+    - godot
+    - gofmt
+    - goimports
+    - gosec
+    - ifshort
+    - importas
+    - lll
+    - misspell
+    - unconvert
+    - unparam
+    - wastedassign
+    - whitespace
+    - wrapcheck
+    - wsl

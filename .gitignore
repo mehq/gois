@@ -2,8 +2,11 @@
 /.idea
 /.release
 /.tarballs
+/.tmp
+/.vscode
+/bin
+/dist
+/gois
 /vendor
 .DS_Store
 coverage.txt
-/gomage
-testfile.html

@@ -1,20 +1,36 @@
 name: Test
 
 on:
+  pull_request:
+    branches:
+      - develop
+      - master
   push:
     branches:
+      - develop
       - master
 
 jobs:
   test:
     runs-on: ubuntu-18.04
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Set up Go 1.16
         uses: actions/setup-go@v2
         with:
           go-version: '1.16'
-      - name: Run tests
-        run: make test
-      - name: Upload coverage report
-        run: bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_TOKEN }}
+      - name: Set up golangci-lint 1.41.1
+        run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.41.1
+      - name: Run checks, tests, build
+        run: make all
+      - uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.txt
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+          verbose: true

@@ -1,42 +1,29 @@
-GOCMD ?= go
-GOPATH ?= $(shell go env GOPATH)
-GOBIN ?= $(firstword $(subst :, ,${GOPATH}))/bin
-
 GO111MODULE ?= on
 export GO111MODULE
 GOPROXY ?= https://proxy.golang.org
 export GOPROXY
 
-DIST_DIR = dist
-BINARY_NAME = gomage
-BUILD_NUMBER ?= $(shell git rev-list HEAD --count)
-TAG ?= vX.X.X
-VERSION = $(TAG:v%=%)
-LDFLAGS = -ldflags "-X main.buildNumber=${BUILD_NUMBER} -X main.programVersion=${VERSION} -X main.programName=${BINARY_NAME} -X main.programPlatform=${}"
+BINARY ?= gois
 
-all: test build
+all: check test build
 
 build: ## Build for current platform
-	@$(GOCMD) build $(LDFLAGS) -o $(DIST_DIR)/$(BINARY_NAME)
+	@go build -o bin/$(BINARY)
 
 check: deps ## Check source code issues
-	@bash scripts/gocheck.sh
+	@golangci-lint run ./...
 
-clean: ## Remove build/ci related file
-	@$(GOCMD) clean
-	@rm -fr ./dist ||:
-	@rm coverage.txt ||:
-
-crossbuild: ## Build for multiple platforms
-	@GOOS=darwin GOARCH=amd64 $(GOCMD) build $(LDFLAGS) -o $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).darwin-amd64/$(BINARY_NAME)
-	@GOOS=freebsd GOARCH=amd64 $(GOCMD) build $(LDFLAGS) -o $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).freebsd-amd64/$(BINARY_NAME)
-	@GOOS=linux GOARCH=amd64 $(GOCMD) build $(LDFLAGS) -o $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).linux-amd64/$(BINARY_NAME)
-	@GOOS=linux GOARCH=arm64 $(GOCMD) build $(LDFLAGS) -o $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).linux-arm64/$(BINARY_NAME)
-	@GOOS=windows GOARCH=amd64 $(GOCMD) build $(LDFLAGS) -o $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).windows-amd64/$(BINARY_NAME).exe
+clean: ## Remove build files
+	@go clean
+	@rm -fr ./.build ./.release ./.tarballs ./.tmp ./bin ./dist ./gois ./vendor ./coverage.txt ||:
 
 deps: ## Ensures fresh go.mod and go.sum.
-	@$(GOCMD) mod tidy
-	@$(GOCMD) mod verify
+	@go mod tidy
+	@go mod verify
+
+fmt: ## Format code
+	@gofmt -w .
+	@goimports -local github.com/mzbaulhaque/gois -w .
 
 help: ## Show this help
 	@echo 'Usage: make [target]'
@@ -47,20 +34,5 @@ help: ## Show this help
 		else if (/^## .*$$/) {printf "  %s\n", substr($$1,4)} \
 		}' $(MAKEFILE_LIST)
 
-install: ## Install the program
-	@GOBIN=$(GOBIN) $(GOCMD) install -v $(LDFLAGS)
-
-release: clean crossbuild ## Build release artifacts
-	@cp CHANGELOG.md LICENSE README.md $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).darwin-amd64/
-	@cp CHANGELOG.md LICENSE README.md $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).freebsd-amd64/
-	@cp CHANGELOG.md LICENSE README.md $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).linux-amd64/
-	@cp CHANGELOG.md LICENSE README.md $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).linux-arm64/
-	@cp CHANGELOG.md LICENSE README.md $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).windows-amd64/
-	@cd $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).darwin-amd64/; tar -zcf ../$(BINARY_NAME)-$(VERSION).darwin-amd64.tar.gz *
-	@cd $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).freebsd-amd64/; tar -zcf ../$(BINARY_NAME)-$(VERSION).freebsd-amd64.tar.gz *
-	@cd $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).linux-amd64/; tar -zcf ../$(BINARY_NAME)-$(VERSION).linux-amd64.tar.gz *
-	@cd $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).linux-arm64/; tar -zcf ../$(BINARY_NAME)-$(VERSION).linux-arm64.tar.gz *
-	@cd $(DIST_DIR)/$(BINARY_NAME)-$(VERSION).windows-amd64/; tar -zcf ../$(BINARY_NAME)-$(VERSION).windows-amd64.tar.gz *
-
 test: ## Run tests
-	@$(GOCMD) test -v -race -coverprofile=coverage.txt -covermode=atomic -tags test
+	@go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...

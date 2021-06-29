@@ -1,27 +1,20 @@
-[![CI](https://github.com/mzbaulhaque/gomage/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/mzbaulhaque/gomage/actions/workflows/test.yml)
-[![codecov](https://codecov.io/gh/mzbaulhaque/gomage/branch/master/graph/badge.svg)](https://codecov.io/gh/mzbaulhaque/gomage)
+[![CI](https://github.com/mzbaulhaque/gois/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/mzbaulhaque/gois/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/mzbaulhaque/gois/branch/master/graph/badge.svg)](https://codecov.io/gh/mzbaulhaque/gois)
 
-**gomage** - CLI program to search and download images in bulk
+**gois** - Command line program to search images
 
 ## INSTALLATION
 
 To install from source, use the following command:
 
 ```shell
-make install # Installs gomage at $GOBIN or $GOPATH/bin
+go get github.com/mzbaulhaque/gois
 ```
-
-**Go (v1.16+) is required.**
 
 ## USAGE
 
-You can use it directly from any terminal window after installation (assuming installation directory is in $PATH).
+You should be able to use it directly from terminal window after installation.
 
 ```shell
-gomage [options] query # query is any valid search query, e.g. cats, dogs
-```
-
-To view available options:
-```shell
-gomage -help
+gois --help # view available commands and flags
 ```

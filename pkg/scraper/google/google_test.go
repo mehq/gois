@@ -1,9 +1,11 @@
-package scraper
+package google
 
 import (
-	"github.com/mzbaulhaque/gomage/internal"
 	"testing"
 	"time"
+
+	"github.com/mzbaulhaque/gois/internal/util/request"
+	"github.com/mzbaulhaque/gois/internal/util/testutil"
 )
 
 func TestGoogle_Scrape(t *testing.T) {
@@ -13,62 +15,64 @@ func TestGoogle_Scrape(t *testing.T) {
 		}
 	}()
 
-	var optionTests = []internal.Options{
+	var optionTests = []*Config{
 		{
 			Query:    "cats",
-			Safe:     true,
-			Gif:      false,
+			Explicit: true,
+			GIF:      false,
 			Gray:     false,
 			Height:   0,
 			Width:    0,
-			TestMode: true,
+			Compact:  false,
 		},
 		{
 			Query:    "cats",
-			Safe:     false,
-			Gif:      true,
+			Explicit: false,
+			GIF:      true,
 			Gray:     false,
 			Height:   0,
 			Width:    0,
-			TestMode: true,
+			Compact:  false,
 		},
 		{
 			Query:    "cats",
-			Safe:     false,
-			Gif:      false,
+			Explicit: false,
+			GIF:      false,
 			Gray:     true,
 			Height:   0,
 			Width:    0,
-			TestMode: true,
+			Compact:  false,
 		},
 		{
 			Query:    "cats",
-			Safe:     false,
-			Gif:      false,
+			Explicit: false,
+			GIF:      false,
 			Gray:     false,
 			Height:   1080,
 			Width:    1920,
-			TestMode: true,
+			Compact:  false,
 		},
 		{
 			Query:    "cats",
-			Safe:     false,
-			Gif:      false,
+			Explicit: true,
+			GIF:      false,
 			Gray:     false,
-			Height:   0,
-			Width:    0,
-			TestMode: false,
+			Height:   1080,
+			Width:    1920,
+			Compact:  true,
 		},
 	}
 
-	client := internal.MakeHTTPClient()
+	client := request.NewHTTPClient()
 
 	for _, test := range optionTests {
-		google := Google{
+		googleScraper := Google{
 			Client: client,
-			Opts:   &test,
+			Config: test,
 		}
-		items := google.Scrape()
+		items, err := googleScraper.Scrape()
+
+		testutil.CheckErr(t, err)
 
 		if len(items) < 1 {
 			t.Errorf("0 items scraped from google")

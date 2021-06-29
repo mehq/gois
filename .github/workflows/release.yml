@@ -9,23 +9,19 @@ jobs:
   release:
     runs-on: ubuntu-18.04
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Set up Go 1.16
         uses: actions/setup-go@v2
         with:
           go-version: 1.16
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+      - name: Set up and run GoReleaser 0.172.1
+        uses: goreleaser/goreleaser-action@v2
         with:
-          python-version: 3.8
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests
-      - name: Set tag
-        id: vars
-        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
-      - name: Make release assets
-        run: VERSION=${{ steps.vars.outputs.tag }} make release
-      - name: Create release
-        run: GH_ACCESS_TOKEN=${{ secrets.GH_ACCESS_TOKEN }} python scripts/gh-release.py ${{ steps.vars.outputs.tag }}
+          distribution: goreleaser
+          version: 0.172.1
+          args: release --rm-dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
