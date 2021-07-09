@@ -1,7 +1,8 @@
 [![CI](https://github.com/mzbaulhaque/gois/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/mzbaulhaque/gois/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/mzbaulhaque/gois/branch/master/graph/badge.svg)](https://codecov.io/gh/mzbaulhaque/gois)
+[![Go Report Card](https://goreportcard.com/badge/github.com/mzbaulhaque/gois)](https://goreportcard.com/report/github.com/mzbaulhaque/gois)
 
-**gois** - Command line program to search images
+**gois** - Search images from command line
 
 ## INSTALLATION
 
