@@ -17,3 +17,17 @@ You should be able to use it directly from terminal window.
 ```shell
 gois --help # view available commands and flags
 ```
+
+Search images:
+
+```shell
+gois bing "night sky" # using bing
+gois google "night sky" # using google
+```
+
+Please note that **gois** currently does not support automatic downloading of images. But you can easily do that using output from **gois** and piping that to **curl**/**wget**.
+
+```shell
+gois google -c "night sky" | xargs curl -k -L -s --compressed -O
+gois google -c "night sky" | wget -i-
+```
