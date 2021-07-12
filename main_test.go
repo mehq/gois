@@ -37,24 +37,44 @@ func setup() {
 	}
 }
 
-func TestGoisGoogle(t *testing.T) {
+func TestGois(t *testing.T) {
 	re := regexp.MustCompile("^Title: .+\nWebpage: http.*\nResolution: [0-9]+x[0-9]+\nURL: http.+\nThumbnail: http.+\n")
 
 	var testCases = []testutil.TestCase{
 		{
+			In:  []string{"bing", "cats"},
+			Out: nil,
+		},
+		{
 			In:  []string{"google", "cats"},
+			Out: nil,
+		},
+		{
+			In:  []string{"bing", "-x", "cats"},
 			Out: nil,
 		},
 		{
 			In:  []string{"google", "-x", "cats"},
 			Out: nil,
 		},
+		//{
+		//	In:  []string{"bing", "-g", "cats"},
+		//	Out: nil,
+		//},
+		//{
+		//	In:  []string{"google", "-g", "cats"},
+		//	Out: nil,
+		//},
+		//{
+		//	In:  []string{"bing", "-B", "cats"},
+		//	Out: nil,
+		//},
+		//{
+		//	In:  []string{"google", "-B", "cats"},
+		//	Out: nil,
+		//},
 		{
-			In:  []string{"google", "-g", "cats"},
-			Out: nil,
-		},
-		{
-			In:  []string{"google", "-B", "cats"},
+			In:  []string{"bing", "-H", "1080", "-w", "1920", "cats"},
 			Out: nil,
 		},
 		{
@@ -71,24 +91,36 @@ func TestGoisGoogle(t *testing.T) {
 	}
 }
 
-func TestGoisGoogle_Compact(t *testing.T) {
+func TestGois_Compact(t *testing.T) {
 	re := regexp.MustCompile("^http.+\n")
 
 	var testCases = []testutil.TestCase{
 		{
+			In:  []string{"bing", "-c", "cats"},
+			Out: nil,
+		},
+		{
 			In:  []string{"google", "-c", "cats"},
+			Out: nil,
+		},
+		{
+			In:  []string{"bing", "-c", "-x", "cats"},
 			Out: nil,
 		},
 		{
 			In:  []string{"google", "-c", "-x", "cats"},
 			Out: nil,
 		},
+		//{
+		//	In:  []string{"google", "-c", "-g", "cats"},
+		//	Out: nil,
+		//},
+		//{
+		//	In:  []string{"google", "-c", "-B", "cats"},
+		//	Out: nil,
+		//},
 		{
-			In:  []string{"google", "-c", "-g", "cats"},
-			Out: nil,
-		},
-		{
-			In:  []string{"google", "-c", "-B", "cats"},
+			In:  []string{"bing", "-c", "-H", "1080", "-w", "1920", "cats"},
 			Out: nil,
 		},
 		{
