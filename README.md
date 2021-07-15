@@ -28,6 +28,6 @@ gois google "night sky" # using google
 Please note that **gois** currently does not support automatic downloading of images. But you can easily do that using output from **gois** and piping that to **curl**/**wget**.
 
 ```shell
-gois google -c "night sky" | xargs curl -k -L -s --compressed -O
-gois google -c "night sky" | wget -i-
+gois google -c "night sky" | xargs -I url curl --progress-bar --compressed --connect-timeout 10 --retry 3 -k -L -O url
+gois google -c "night sky" | wget -q --show-progress -c -nc -T 10 -t 3 -i-
 ```
