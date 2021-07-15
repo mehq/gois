@@ -4,7 +4,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mzbaulhaque/gois/internal/util/request"
 	"github.com/mzbaulhaque/gois/internal/util/testutil"
 )
 
@@ -63,11 +62,8 @@ func TestBing_Scrape(t *testing.T) {
 		},
 	}
 
-	client := request.NewHTTPClient()
-
 	for _, test := range optionTests {
 		bingScraper := Bing{
-			Client: client,
 			Config: test,
 		}
 		items, err := bingScraper.Scrape()

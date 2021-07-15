@@ -1,4 +1,6 @@
 release:
+  prerelease: auto
+  draft: true
   name_template: '{{.ProjectName}} {{.Version}}'
 
 env:
@@ -30,12 +32,10 @@ builds:
       - -X github.com/mzbaulhaque/gois/internal/build.Version={{.Version}}
 
 archives:
-  - name_template: '{{.ProjectName}}_{{.Os}}_{{.Arch}}{{ if .Arm }}v{{.Arm}}{{ end }}'
+  - name_template: '{{.ProjectName}}_{{.Version}}_{{.Os}}_{{.Arch}}{{ if .Arm }}v{{ .Arm }}'
     replacements:
-      darwin: Darwin
-      linux: Linux
-      windows: Windows
       amd64: x86_64
+      darwin: macOS
     format_overrides:
       - goos: windows
         format: zip
@@ -58,3 +58,5 @@ changelog:
       - '^refactor'
       - '^style'
       - '^test'
+      - '^Update$'
+      - Merge pull request

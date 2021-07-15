@@ -28,6 +28,11 @@ func TestAtoi(t *testing.T) {
 			t.Errorf("conv#Atoi invalid output %d for input %s, expected %d", got, test.In, test.Out)
 		}
 	}
+
+	// edge case
+	if got := Atoi("ABC"); got != 0 {
+		t.Errorf("conv#Atoi invalid output %d for input %s, expected %d", got, "ABC", 0)
+	}
 }
 
 func TestItoa(t *testing.T) {
