@@ -32,7 +32,7 @@ builds:
       - -X github.com/mzbaulhaque/gois/internal/build.Version={{.Version}}
 
 archives:
-  - name_template: '{{.ProjectName}}_{{.Version}}_{{.Os}}_{{.Arch}}{{ if .Arm }}v{{ .Arm }}'
+  - name_template: '{{.ProjectName}}_{{.Version}}_{{.Os}}_{{.Arch}}{{ if .Arm }}v{{ .Arm }}{{ end }}'
     replacements:
       amd64: x86_64
       darwin: macOS
