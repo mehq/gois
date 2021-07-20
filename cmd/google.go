@@ -36,13 +36,13 @@ func newGoogleCmd() *cobra.Command {
 				SafeSearch: safeSearch,
 			}
 			gs := &scraper.GoogleScraper{Config: config}
-			items, err := gs.Scrape()
+			items, pages, err := gs.Scrape()
 
 			if err != nil {
 				return err
 			}
 
-			util.PrintResults(items, config.Compact)
+			util.PrintResults(items, pages, config.Compact)
 
 			return nil
 		},

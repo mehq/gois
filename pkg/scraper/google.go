@@ -197,11 +197,11 @@ func (g GoogleScraper) makeFilterString() (string, error) {
 }
 
 // Scrape is the entrypoint.
-func (g GoogleScraper) Scrape() ([]interface{}, error) {
+func (g GoogleScraper) Scrape() ([]interface{}, int, error) {
 	filter, err := g.makeFilterString()
 
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	paramIjn := -1
@@ -227,7 +227,7 @@ func (g GoogleScraper) Scrape() ([]interface{}, error) {
 	} else if g.Config.SafeSearch == "off" {
 		params["safe"] = "images"
 	} else if g.Config.SafeSearch != "" {
-		return nil, fmt.Errorf("--safe-search: invalid value %s", g.Config.SafeSearch)
+		return nil, 0, fmt.Errorf("--safe-search: invalid value %s", g.Config.SafeSearch)
 	}
 
 	if g.Config.Region != "" {
@@ -237,9 +237,11 @@ func (g GoogleScraper) Scrape() ([]interface{}, error) {
 	hasMore := true
 	items := make([]interface{}, 0)
 	itemsURLCache := make(map[string]bool)
+	pages := 0
 
 	for hasMore {
 		newCount := 0
+		pages += 1
 		paramIjn += 1
 		paramStart = paramIjn * 100
 		params["ijn"] = strconv.Itoa(paramIjn)
@@ -247,13 +249,13 @@ func (g GoogleScraper) Scrape() ([]interface{}, error) {
 		page, err := util.DownloadWebpage("https://www.google.com/search", http.StatusOK, &headers, &params)
 
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 
 		matches, err := util.SearchRegexMultiple("notranslate\"[^>]*>([^<]+)", string(page), "links", false)
 
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 
 		for _, match := range matches {
@@ -261,7 +263,7 @@ func (g GoogleScraper) Scrape() ([]interface{}, error) {
 			err = json.Unmarshal([]byte(match), gr)
 
 			if err != nil {
-				return nil, fmt.Errorf("cannot json.Unmarshal on match")
+				return nil, 0, fmt.Errorf("cannot json.Unmarshal on match")
 			}
 
 			if !itemsURLCache[gr.URL] {
@@ -274,5 +276,5 @@ func (g GoogleScraper) Scrape() ([]interface{}, error) {
 		hasMore = newCount > 0
 	}
 
-	return items, nil
+	return items, 0, nil
 }

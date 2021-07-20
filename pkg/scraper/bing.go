@@ -161,11 +161,11 @@ func (b BingScraper) makeFilterString() (string, error) {
 }
 
 // Scrape is the entrypoint.
-func (b BingScraper) Scrape() ([]interface{}, error) {
+func (b BingScraper) Scrape() ([]interface{}, int, error) {
 	filter, err := b.makeFilterString()
 
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	var safeSearchOption string
@@ -177,7 +177,7 @@ func (b BingScraper) Scrape() ([]interface{}, error) {
 	} else if b.Config.SafeSearch == "moderate" {
 		safeSearchOption = "DEMOTE"
 	} else if b.Config.SafeSearch != "" {
-		return nil, fmt.Errorf("--safe-search: invalid value %s", b.Config.SafeSearch)
+		return nil, 0, fmt.Errorf("--safe-search: invalid value %s", b.Config.SafeSearch)
 	}
 
 	paramFirst := -150
@@ -198,37 +198,39 @@ func (b BingScraper) Scrape() ([]interface{}, error) {
 	hasMore := true
 	items := make([]interface{}, 0)
 	itemsURLCache := make(map[string]bool)
+	pages := 0
 
 	for hasMore {
 		newCount := 0
+		pages += 1
 		paramFirst += 150
 		params["first"] = strconv.Itoa(paramFirst)
 		page, err := util.DownloadWebpage("https://www.bing.com/images/async", http.StatusOK, &headers, &params)
 
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 
 		matches, err := util.SearchRegexMultiple("iusc\"[\\s\\n]+style=\"[^\"]+\"[\\s\\n]+(?:gif=\"[^\"]+\"[\\s\\n]+)?m=\"([^\"]+)\"", string(page), "links", false)
 
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 
 		widths, err := util.SearchRegexMultiple("nowrap\">\\s*([0-9]+)\\s*x\\s*[0-9]+\\s*&#183;\\s*[a-zA-Z]+</span>", string(page), "widths", false)
 
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 
 		heights, err := util.SearchRegexMultiple("nowrap\">\\s*[0-9]+\\s*x\\s*([0-9]+)\\s*&#183;\\s*[a-zA-Z]+</span>", string(page), "heights", false)
 
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 
 		if len(matches) != len(widths) && len(widths) != len(heights) {
-			return nil, fmt.Errorf("matche count != width count != height count")
+			return nil, 0, fmt.Errorf("matche count != width count != height count")
 		}
 
 		for i, match := range matches {
@@ -236,20 +238,11 @@ func (b BingScraper) Scrape() ([]interface{}, error) {
 			err = json.Unmarshal([]byte(strings.ReplaceAll(match, "&quot;", "\"")), br)
 
 			if err != nil {
-				return nil, fmt.Errorf("cannot json.Unmarshal on match %s", strings.ReplaceAll(match, "&quot;", "\""))
+				return nil, 0, fmt.Errorf("cannot json.Unmarshal on match %s", strings.ReplaceAll(match, "&quot;", "\""))
 			}
 
-			br.Height, err = strconv.Atoi(heights[i])
-
-			if err != nil {
-				return nil, fmt.Errorf("cannot convert height (%s) to int", heights[i])
-			}
-
-			br.Width, err = strconv.Atoi(widths[i])
-
-			if err != nil {
-				return nil, fmt.Errorf("cannot convert width (%s) to int", widths[i])
-			}
+			br.Height, _ = strconv.Atoi(heights[i])
+			br.Width, _ = strconv.Atoi(widths[i])
 
 			if !itemsURLCache[br.URL] {
 				items = append(items, br)
@@ -261,5 +254,5 @@ func (b BingScraper) Scrape() ([]interface{}, error) {
 		hasMore = newCount > 0
 	}
 
-	return items, nil
+	return items, pages, nil
 }

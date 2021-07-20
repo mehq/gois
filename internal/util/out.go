@@ -8,7 +8,7 @@ import (
 
 
 // PrintResults writes search result to stdout.
-func PrintResults(items []interface{}, compact bool) {
+func PrintResults(items []interface{}, pages int, compact bool) {
 	compactTmplText := "{{.URL}}\n"
 	tmplText := `Title: {{.Title}}
 Webpage: {{.ReferenceURL}}
@@ -24,13 +24,15 @@ Thumbnail: {{.ThumbnailURL}}
 		tmpl, _ = template.New("scraperOut").Parse(tmplText)
 	}
 
-	itemsLen := len(items)
-
-	for i, item := range items {
+	for _, item := range items {
 		_ = tmpl.Execute(os.Stdout, item)
 
-		if i != itemsLen-1 && !compact {
+		if !compact {
 			fmt.Println("---")
 		}
+	}
+
+	if !compact {
+		fmt.Printf("Scraped %d pages, got %d items\n", pages, len(items))
 	}
 }

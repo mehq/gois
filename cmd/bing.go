@@ -36,13 +36,13 @@ func newBingCmd() *cobra.Command {
 				SafeSearch: safeSearch,
 			}
 			bs := &scraper.BingScraper{Config: config}
-			items, err := bs.Scrape()
+			items, pages, err := bs.Scrape()
 
 			if err != nil {
 				return err
 			}
 
-			util.PrintResults(items, config.Compact)
+			util.PrintResults(items, pages, config.Compact)
 
 			return nil
 		},
