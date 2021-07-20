@@ -1,4 +1,4 @@
-package testutil
+package util
 
 import (
 	"regexp"
@@ -21,6 +21,6 @@ func CheckErr(t *testing.T, err error) {
 // CheckCmdOutput can be used to match output of a command with a target Regexp.
 func CheckCmdOutput(t *testing.T, output []byte, matchWith *regexp.Regexp) {
 	if !matchWith.Match(output) {
-		t.Error("Command output not matching")
+		t.Error("command output not matching")
 	}
 }
