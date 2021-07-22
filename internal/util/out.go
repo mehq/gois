@@ -15,6 +15,7 @@ Resolution: {{.Width}}x{{.Height}}
 URL: {{.URL}}
 Thumbnail: {{.ThumbnailURL}}
 `
+
 	var tmpl *template.Template
 
 	if compact {

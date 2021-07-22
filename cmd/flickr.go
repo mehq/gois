@@ -1,10 +1,13 @@
 package cmd
 
 import (
+	"fmt"
+
+	"github.com/spf13/cobra"
+
 	"github.com/mzbaulhaque/gois/internal/util"
 	"github.com/mzbaulhaque/gois/pkg/scraper/params"
 	"github.com/mzbaulhaque/gois/pkg/scraper/services"
-	"github.com/spf13/cobra"
 )
 
 func newFlickrCmd() *cobra.Command {
@@ -33,7 +36,7 @@ func newFlickrCmd() *cobra.Command {
 			items, pages, err := fs.Scrape()
 
 			if err != nil {
-				return err
+				return fmt.Errorf("%v", err)
 			}
 
 			util.PrintResults(items, pages, config.Compact)
@@ -42,12 +45,78 @@ func newFlickrCmd() *cobra.Command {
 		},
 	}
 
-	flickrCmd.PersistentFlags().BoolP("compact", "c", false, "Print original image link per line with no other information.")
-	flickrCmd.Flags().String("image-color", "", buildFlagUsageMessage("Find images in your preferred color", "all", params.ColorRed, params.ColorDarkOrange, params.ColorOrange, params.ColorPalePink, params.ColorLemonYellow, params.ColorSchoolBusYellow, params.ColorGreen, params.ColorDarkLimeGreen, params.ColorCyan, params.ColorBlue, params.ColorViolet, params.ColorPink, params.ColorWhite, params.ColorGray, params.ColorBlack))
-	flickrCmd.Flags().String("image-size", "", buildFlagUsageMessage("Find images in specific size", "all", params.ImageSizeLarge, params.ImageSizeMedium))
-	flickrCmd.Flags().String("image-type", "", buildFlagUsageMessage("Limit the kind of images that you find", "all", params.ColorBlackAndWhite, params.ImageTypeShallowDepthOfField, params.ImageTypeMinimal, params.ImageTypePatterns))
-	flickrCmd.Flags().String("orientation", "", buildFlagUsageMessage("Specify the orientation of images", "all", params.OrientationLandscape, params.OrientationPortrait, params.AspectRatioSquare, params.AspectRatioPanoramic))
-	flickrCmd.Flags().String("safe-search", "on", buildFlagUsageMessage("Tell SafeSearch whether to filter sexually explicit content", params.SafeSearchOn, params.SafeSearchOff, params.SafeSearchModerate))
+	flickrCmd.PersistentFlags().BoolP(
+		"compact",
+		"c",
+		false,
+		"Print original image link per line with no other information.",
+	)
+	flickrCmd.Flags().String(
+		"image-color",
+		"",
+		buildFlagUsageMessage(
+			"Find images in your preferred color",
+			"all",
+			params.ColorRed,
+			params.ColorDarkOrange,
+			params.ColorOrange,
+			params.ColorPalePink,
+			params.ColorLemonYellow,
+			params.ColorSchoolBusYellow,
+			params.ColorGreen, params.ColorDarkLimeGreen,
+			params.ColorCyan,
+			params.ColorBlue,
+			params.ColorViolet,
+			params.ColorPink,
+			params.ColorWhite,
+			params.ColorGray,
+			params.ColorBlack,
+		),
+	)
+	flickrCmd.Flags().String(
+		"image-size",
+		"",
+		buildFlagUsageMessage(
+			"Find images in specific size",
+			"all",
+			params.ImageSizeLarge,
+			params.ImageSizeMedium,
+		),
+	)
+	flickrCmd.Flags().String(
+		"image-type",
+		"",
+		buildFlagUsageMessage(
+			"Limit the kind of images that you find",
+			"all",
+			params.ColorBlackAndWhite,
+			params.ImageTypeShallowDepthOfField,
+			params.ImageTypeMinimal,
+			params.ImageTypePatterns,
+		),
+	)
+	flickrCmd.Flags().String(
+		"orientation",
+		"",
+		buildFlagUsageMessage(
+			"Specify the orientation of images",
+			"all",
+			params.OrientationLandscape,
+			params.OrientationPortrait,
+			params.AspectRatioSquare,
+			params.AspectRatioPanoramic,
+		),
+	)
+	flickrCmd.Flags().String(
+		"safe-search",
+		"on",
+		buildFlagUsageMessage(
+			"Tell SafeSearch whether to filter sexually explicit content",
+			params.SafeSearchOn,
+			params.SafeSearchOff,
+			params.SafeSearchModerate,
+		),
+	)
 
 	return flickrCmd
 }

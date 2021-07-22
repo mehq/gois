@@ -1,17 +1,16 @@
-// Flickr scraping.
-
 package services
 
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/mzbaulhaque/gois/internal/util"
-	"github.com/mzbaulhaque/gois/pkg/scraper/params"
 	"net/http"
 	"strconv"
+
+	"github.com/mzbaulhaque/gois/internal/util"
+	"github.com/mzbaulhaque/gois/pkg/scraper/params"
 )
 
-// FlickrConfig is a set of options used by Google.
+// FlickrConfig is a set of options used by FlickrScraper to perform/filter/format search results.
 type FlickrConfig struct {
 	Compact     bool
 	ImageColor  string
@@ -22,12 +21,12 @@ type FlickrConfig struct {
 	SafeSearch  string
 }
 
-// FlickrScraper is used to scrape data from google search engine.
+// FlickrScraper represents scraper for flickr image search.
 type FlickrScraper struct {
 	Config *FlickrConfig
 }
 
-// FlickrResult is
+// FlickrResult is a set of attributes that defines an image result.
 type FlickrResult struct {
 	Height       int    `json:"height_o"`
 	Width        int    `json:"width_o"`
@@ -144,24 +143,29 @@ func (f FlickrScraper) getAPIKey() (string, error) {
 	})
 
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("%v", err)
 	}
 
-	key, err := util.SearchRegex("root.YUI_config.flickr.api.site_key\\s*=\\s*\"([a-z0-9]+)\"", string(page), "apiKey", true)
+	key, err := util.SearchRegex(
+		"root.YUI_config.flickr.api.site_key\\s*=\\s*\"([a-z0-9]+)\"",
+		string(page),
+		"apiKey",
+		true,
+	)
 
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("%v", err)
 	}
 
 	return key, nil
 }
 
-// Scrape is the entrypoint.
+// Scrape parses and returns the results from flickr image search if successful. An error is returned otherwise.
 func (f FlickrScraper) Scrape() ([]interface{}, int, error) {
 	filters, err := f.getFilters()
 
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, fmt.Errorf("%v", err)
 	}
 
 	if len(filters) > 0 {
@@ -171,14 +175,15 @@ func (f FlickrScraper) Scrape() ([]interface{}, int, error) {
 	apiKey, err := f.getAPIKey()
 
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, fmt.Errorf("%v", err)
 	}
 
 	paramPage := 0
 	qParams := map[string]string{
-		"sort":           "relevance",
-		"content_type":   "7",
-		"extras":         "count_comments,count_faves,count_views,date_taken,date_upload,description,icon_urls_deep,license,path_alias,perm_print,realname,url_t,url_o,visibility,visibility_source,o_dims",
+		"sort":         "relevance",
+		"content_type": "7",
+		"extras": "count_comments,count_faves,count_views,date_taken,date_upload,description,icon_urls_deep," +
+			"license,path_alias,perm_print,realname,url_t,url_o,visibility,visibility_source,o_dims",
 		"per_page":       "500",
 		"page":           strconv.Itoa(paramPage),
 		"text":           f.Config.Query,
@@ -203,10 +208,15 @@ func (f FlickrScraper) Scrape() ([]interface{}, int, error) {
 		pages += 1
 		paramPage += 1
 		qParams["page"] = strconv.Itoa(paramPage)
-		page, err := util.DownloadWebpage("https://api.flickr.com/services/rest", http.StatusOK, nil, qParams)
+		page, err := util.DownloadWebpage(
+			"https://api.flickr.com/services/rest",
+			http.StatusOK,
+			nil,
+			qParams,
+		)
 
 		if err != nil {
-			return nil, 0, err
+			return nil, 0, fmt.Errorf("%v", err)
 		}
 
 		res := &flickrResponse{}

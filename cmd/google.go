@@ -1,10 +1,13 @@
 package cmd
 
 import (
+	"fmt"
+
+	"github.com/spf13/cobra"
+
 	"github.com/mzbaulhaque/gois/internal/util"
 	"github.com/mzbaulhaque/gois/pkg/scraper/params"
 	"github.com/mzbaulhaque/gois/pkg/scraper/services"
-	"github.com/spf13/cobra"
 )
 
 func newGoogleCmd() *cobra.Command {
@@ -33,7 +36,7 @@ func newGoogleCmd() *cobra.Command {
 			items, pages, err := gs.Scrape()
 
 			if err != nil {
-				return err
+				return fmt.Errorf("%v", err)
 			}
 
 			util.PrintResults(items, pages, config.Compact)
@@ -42,12 +45,80 @@ func newGoogleCmd() *cobra.Command {
 		},
 	}
 
-	googleCmd.Flags().String("aspect-ratio", "", buildFlagUsageMessage("Specify the shape of images", "all", params.AspectRatioTall, params.AspectRatioSquare, params.AspectRationWide, params.AspectRatioPanoramic))
-	googleCmd.PersistentFlags().BoolP("compact", "c", false, "Print original image link per line with no other information.")
-	googleCmd.Flags().String("image-color", "", buildFlagUsageMessage("Find images in your preferred color", "all", params.ColorFull, params.ColorBlackAndWhite, params.ImageTypeTransparent, params.ColorRed, params.ColorOrange, params.ColorYellow, params.ColorGreen, params.ColorTeal, params.ColorBlue, params.ColorPurple, params.ColorPink, params.ColorWhite, params.ColorGray, params.ColorBlack, params.ColorBrown))
-	googleCmd.Flags().String("image-size", "", buildFlagUsageMessage("Find images in specific size", "all", params.ImageSizeLarge, params.ImageSizeMedium, params.ImageSizeIcon))
-	googleCmd.Flags().String("image-type", "", buildFlagUsageMessage("Limit the kind of images that you find", "all", params.ImageTypeFace, params.ImageTypePhoto, params.ImageTypeClipArt, params.ImageTypeLineDrawing, params.ImageTypeAnimated))
-	googleCmd.Flags().String("safe-search", "on", buildFlagUsageMessage("Tell SafeSearch whether to filter sexually explicit content", params.SafeSearchOn, params.SafeSearchOff))
+	googleCmd.Flags().String(
+		"aspect-ratio",
+		"",
+		buildFlagUsageMessage(
+			"Specify the shape of images",
+			"all",
+			params.AspectRatioTall,
+			params.AspectRatioSquare,
+			params.AspectRationWide,
+			params.AspectRatioPanoramic,
+		),
+	)
+	googleCmd.PersistentFlags().BoolP(
+		"compact",
+		"c",
+		false,
+		"Print original image link per line with no other information.",
+	)
+	googleCmd.Flags().String(
+		"image-color",
+		"",
+		buildFlagUsageMessage(
+			"Find images in your preferred color",
+			"all",
+			params.ColorFull,
+			params.ColorBlackAndWhite,
+			params.ImageTypeTransparent,
+			params.ColorRed,
+			params.ColorOrange,
+			params.ColorYellow,
+			params.ColorGreen,
+			params.ColorTeal,
+			params.ColorBlue,
+			params.ColorPurple,
+			params.ColorPink,
+			params.ColorWhite,
+			params.ColorGray,
+			params.ColorBlack,
+			params.ColorBrown,
+		),
+	)
+	googleCmd.Flags().String(
+		"image-size",
+		"",
+		buildFlagUsageMessage(
+			"Find images in specific size",
+			"all",
+			params.ImageSizeLarge,
+			params.ImageSizeMedium,
+			params.ImageSizeIcon,
+		),
+	)
+	googleCmd.Flags().String(
+		"image-type",
+		"",
+		buildFlagUsageMessage(
+			"Limit the kind of images that you find",
+			"all",
+			params.ImageTypeFace,
+			params.ImageTypePhoto,
+			params.ImageTypeClipArt,
+			params.ImageTypeLineDrawing,
+			params.ImageTypeAnimated,
+		),
+	)
+	googleCmd.Flags().String(
+		"safe-search",
+		"on",
+		buildFlagUsageMessage(
+			"Tell SafeSearch whether to filter sexually explicit content",
+			params.SafeSearchOn,
+			params.SafeSearchOff,
+		),
+	)
 
 	return googleCmd
 }

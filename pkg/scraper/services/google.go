@@ -1,20 +1,20 @@
-// Google scraping.
-
 package services
 
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
-	"github.com/mzbaulhaque/gois/internal/util"
-	"github.com/mzbaulhaque/gois/pkg/scraper/params"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/PuerkitoBio/goquery"
+
+	"github.com/mzbaulhaque/gois/internal/util"
+	"github.com/mzbaulhaque/gois/pkg/scraper/params"
 )
 
-// GoogleConfig is a set of options used by Google.
+// GoogleConfig is a set of options used by GoogleScraper to perform/filter/format search results.
 type GoogleConfig struct {
 	AspectRatio string
 	Compact     bool
@@ -25,12 +25,12 @@ type GoogleConfig struct {
 	SafeSearch  string
 }
 
-// GoogleScraper is used to scrape data from google search engine.
+// GoogleScraper represents scraper for google image search.
 type GoogleScraper struct {
 	Config *GoogleConfig
 }
 
-// GoogleResult is
+// GoogleResult is a set of attributes that defines an image result.
 type GoogleResult struct {
 	Height       int    `json:"oh"`
 	Width        int    `json:"ow"`
@@ -140,12 +140,12 @@ func (g GoogleScraper) makeFilterString() (string, error) {
 	return strings.Join(filters, ","), nil
 }
 
-// Scrape is the entrypoint.
+// Scrape parses and returns the results from google image search if successful. An error is returned otherwise.
 func (g GoogleScraper) Scrape() ([]interface{}, int, error) {
 	filter, err := g.makeFilterString()
 
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, fmt.Errorf("%v", err)
 	}
 
 	paramIjn := -1
@@ -185,7 +185,7 @@ func (g GoogleScraper) Scrape() ([]interface{}, int, error) {
 		page, err := util.DownloadWebpage("https://www.google.com/search", http.StatusOK, nil, qParams)
 
 		if err != nil {
-			return nil, 0, err
+			return nil, 0, fmt.Errorf("%v", err)
 		}
 
 		r := bytes.NewReader(page)
@@ -193,7 +193,7 @@ func (g GoogleScraper) Scrape() ([]interface{}, int, error) {
 		doc, err := goquery.NewDocumentFromReader(r)
 
 		if err != nil {
-			return nil, 0, err
+			return nil, 0, fmt.Errorf("%v", err)
 		}
 
 		sel := doc.Find("div.rg_meta.notranslate")

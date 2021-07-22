@@ -1,20 +1,20 @@
-// Bing scraping.
-
 package services
 
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
-	"github.com/mzbaulhaque/gois/internal/util"
-	"github.com/mzbaulhaque/gois/pkg/scraper/params"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/PuerkitoBio/goquery"
+
+	"github.com/mzbaulhaque/gois/internal/util"
+	"github.com/mzbaulhaque/gois/pkg/scraper/params"
 )
 
-// BingConfig is a set of options used by Bing.
+// BingConfig is a set of options used by BingScraper to perform/filter/format search results.
 type BingConfig struct {
 	AspectRatio  string
 	Compact      bool
@@ -26,11 +26,12 @@ type BingConfig struct {
 	SafeSearch   string
 }
 
-// BingScraper is used to scrape data from bing search engine.
+// BingScraper represents scraper for bing image search.
 type BingScraper struct {
 	Config *BingConfig
 }
 
+// BingResult is a set of attributes that defines an image result.
 type BingResult struct {
 	Height       int    `json:"-"`
 	Width        int    `json:"-"`
@@ -140,12 +141,17 @@ func (b BingScraper) makeFilterString() (string, error) {
 func (b BingScraper) setSafeSearchSetting() error {
 	q := b.Config.Query
 
-	page, err := util.DownloadWebpage("https://www.bing.com/images/search", http.StatusOK, nil, map[string]string{
-		"q": q,
-	})
+	page, err := util.DownloadWebpage(
+		"https://www.bing.com/images/search",
+		http.StatusOK,
+		nil,
+		map[string]string{
+			"q": q,
+		},
+	)
 
 	if err != nil {
-		return err
+		return fmt.Errorf("%v", err)
 	}
 
 	r := bytes.NewReader(page)
@@ -153,19 +159,19 @@ func (b BingScraper) setSafeSearchSetting() error {
 	doc, err := goquery.NewDocumentFromReader(r)
 
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("%v", err)
 	}
 
 	guid, exists := doc.Find("input#GUID").Attr("value")
 
 	if !exists {
-		panic("guid not found")
+		return fmt.Errorf("guid not found")
 	}
 
 	ru, exists := doc.Find("input#ru").Attr("value")
 
 	if !exists {
-		panic("ru not found")
+		return fmt.Errorf("ru not found")
 	}
 
 	var safeSearchOption string
@@ -193,24 +199,24 @@ func (b BingScraper) setSafeSearchSetting() error {
 	_, err = util.DownloadWebpage("https://www.bing.com/settings.aspx", http.StatusOK, nil, qParams)
 
 	if err != nil {
-		return err
+		return fmt.Errorf("%v", err)
 	}
 
 	return nil
 }
 
-// Scrape is the entrypoint.
+// Scrape parses and returns the results from bing image search if successful. An error is returned otherwise.
 func (b BingScraper) Scrape() ([]interface{}, int, error) {
 	filter, err := b.makeFilterString()
 
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, fmt.Errorf("%v", err)
 	}
 
 	err = b.setSafeSearchSetting()
 
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, fmt.Errorf("%v", err)
 	}
 
 	paramFirst := -150
@@ -232,10 +238,15 @@ func (b BingScraper) Scrape() ([]interface{}, int, error) {
 		pages += 1
 		paramFirst += 150
 		qParams["first"] = strconv.Itoa(paramFirst)
-		page, err := util.DownloadWebpage("https://www.bing.com/images/async", http.StatusOK, nil, qParams)
+		page, err := util.DownloadWebpage(
+			"https://www.bing.com/images/async",
+			http.StatusOK,
+			nil,
+			qParams,
+		)
 
 		if err != nil {
-			return nil, 0, err
+			return nil, 0, fmt.Errorf("%v", err)
 		}
 
 		r := bytes.NewReader(page)
@@ -243,7 +254,7 @@ func (b BingScraper) Scrape() ([]interface{}, int, error) {
 		doc, err := goquery.NewDocumentFromReader(r)
 
 		if err != nil {
-			return nil, 0, err
+			return nil, 0, fmt.Errorf("%v", err)
 		}
 
 		sel := doc.Find("a.iusc")
@@ -260,7 +271,10 @@ func (b BingScraper) Scrape() ([]interface{}, int, error) {
 			err = json.Unmarshal([]byte(strings.ReplaceAll(mAttr, "&quot;", "\"")), br)
 
 			if err != nil {
-				return nil, 0, fmt.Errorf("cannot json.Unmarshal on match '%s'", strings.ReplaceAll(mAttr, "&quot;", "\""))
+				return nil, 0, fmt.Errorf(
+					"cannot json.Unmarshal on match '%s'",
+					strings.ReplaceAll(mAttr, "&quot;", "\""),
+				)
 			}
 
 			hrefAttr, exists := element.Attr("href")
@@ -272,13 +286,13 @@ func (b BingScraper) Scrape() ([]interface{}, int, error) {
 			height, err := util.SearchRegex("exph=([0-9]+)", hrefAttr, "height", true)
 
 			if err != nil {
-				return nil, 0, err
+				return nil, 0, fmt.Errorf("%v", err)
 			}
 
 			width, err := util.SearchRegex("expw=([0-9]+)", hrefAttr, "width", true)
 
 			if err != nil {
-				return nil, 0, err
+				return nil, 0, fmt.Errorf("%v", err)
 			}
 
 			br.Height, _ = strconv.Atoi(height)

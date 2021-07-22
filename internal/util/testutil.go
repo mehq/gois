@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-// TestCase represents generic test case.
+// TestCase represents a generic test case.
 type TestCase struct {
 	In  interface{}
 	Out interface{}

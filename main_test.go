@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/mzbaulhaque/gois/internal/util"
 	"log"
 	"os"
 	"os/exec"
@@ -9,6 +8,8 @@ import (
 	"path/filepath"
 	"regexp"
 	"testing"
+
+	"github.com/mzbaulhaque/gois/internal/util"
 )
 
 const (

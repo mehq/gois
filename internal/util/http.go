@@ -8,9 +8,10 @@ import (
 )
 
 var defaultHeaders = map[string]string{
-	"accept":                    "*/*",
-	"accept-language":           "en-US,en;q=0.9,bn;q=0.8,zh-CN;q=0.7,zh;q=0.6",
-	"user-agent":                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36",
+	"accept":          "*/*",
+	"accept-language": "en-US,en;q=0.9,bn;q=0.8,zh-CN;q=0.7,zh;q=0.6",
+	"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) " +
+		"Chrome/91.0.4472.164 Safari/537.36",
 	"upgrade-insecure-requests": "1",
 }
 
@@ -28,33 +29,35 @@ func getHttpClient() *http.Client {
 	return httpClient
 }
 
-// DownloadWebpage downloads a page and returns its contents as byte array
-func DownloadWebpage(pageUrl string, expectedStatus int, headers map[string]string, params map[string]string) ([]byte, error) {
+// DownloadWebpage downloads a webpage and returns content as byte array if successful. An error is returned
+// otherwise.
+func DownloadWebpage(
+	pageUrl string,
+	expectedStatus int,
+	headers map[string]string,
+	params map[string]string,
+) ([]byte, error) {
 	req, err := http.NewRequest("GET", pageUrl, nil)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("http request error: %v", err)
 	}
 
 	for k, v := range defaultHeaders {
 		req.Header.Add(k, v)
 	}
 
-	if headers != nil {
-		for k, v := range headers {
-			req.Header.Add(k, v)
-		}
+	for k, v := range headers {
+		req.Header.Add(k, v)
 	}
 
-	if params != nil {
-		q := req.URL.Query()
+	q := req.URL.Query()
 
-		for k, v := range params {
-			q.Add(k, v)
-		}
-
-		req.URL.RawQuery = q.Encode()
+	for k, v := range params {
+		q.Add(k, v)
 	}
+
+	req.URL.RawQuery = q.Encode()
 
 	client := getHttpClient()
 
@@ -65,7 +68,7 @@ func DownloadWebpage(pageUrl string, expectedStatus int, headers map[string]stri
 	res, err := client.Do(req)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error performing request: %v", err)
 	}
 
 	defer func() {
@@ -83,7 +86,7 @@ func DownloadWebpage(pageUrl string, expectedStatus int, headers map[string]stri
 	content, err := ioutil.ReadAll(res.Body)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error reading response body: %v", err)
 	}
 
 	return content, nil

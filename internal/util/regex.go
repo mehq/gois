@@ -5,12 +5,14 @@ import (
 	"regexp"
 )
 
+// SearchRegex performs regex search on given string using a pattern returning the first matching group. In case of
+// failure it returns an error (depending on fatal).
 func SearchRegex(expr string, target string, name string, fatal bool) (string, error) {
 	r, err := regexp.Compile(expr)
 
 	if err != nil {
 		if fatal {
-			return "", err
+			return "", fmt.Errorf("regex compilation error: %v", err)
 		}
 
 		return "", nil
@@ -23,34 +25,4 @@ func SearchRegex(expr string, target string, name string, fatal bool) (string, e
 	}
 
 	return subMatch[1], nil
-}
-
-func SearchRegexMultiple(expr string, target string, name string, fatal bool) ([]string, error) {
-	r, err := regexp.Compile(expr)
-
-	if err != nil {
-		if fatal {
-			return nil, err
-		}
-
-		return nil, nil
-	}
-
-	subMatches := r.FindAllStringSubmatch(target, -1)
-
-	if subMatches == nil {
-		if !fatal {
-			return nil, nil
-		}
-
-		return nil, fmt.Errorf("cannot match regex for %s", name)
-	}
-
-	result := make([]string, len(subMatches))
-
-	for i := 0; i < len(result); i += 1 {
-		result[i] = subMatches[i][1]
-	}
-
-	return result, nil
 }

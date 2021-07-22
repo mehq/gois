@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	"github.com/mzbaulhaque/gois/internal/build"
 	"github.com/spf13/cobra"
+
+	"github.com/mzbaulhaque/gois/internal/build"
 )
 
 func newRootCmd() *cobra.Command {
