@@ -1,0 +1,25 @@
+package params
+
+const (
+	ColorBlack           = "black"
+	ColorBlackAndWhite   = "black-white"
+	ColorBlue            = "blue"
+	ColorBrown           = "brown"
+	ColorCyan            = "cyan"
+	ColorDarkLimeGreen   = "dark-lime-green"
+	ColorDarkOrange      = "dark-orange"
+	ColorFull            = "full"
+	ColorGray            = "gray"
+	ColorGreen           = "green"
+	ColorLemonYellow     = "lemon-yellow"
+	ColorOrange          = "orange"
+	ColorPalePink        = "pale-pink"
+	ColorPink            = "pink"
+	ColorPurple          = "purple"
+	ColorRed             = "red"
+	ColorSchoolBusYellow = "school-bus-yellow"
+	ColorTeal            = "teal"
+	ColorViolet          = "violet"
+	ColorWhite           = "white"
+	ColorYellow          = "yellow"
+)

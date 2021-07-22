@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -18,9 +19,13 @@ func Execute() {
 `)
 	c.SetHelpCommand(&cobra.Command{Hidden: true})
 
-	c.AddCommand(newBingCmd(), newGoogleCmd())
+	c.AddCommand(newBingCmd(), newFlickrCmd(), newGoogleCmd())
 
 	if err := c.Execute(); err != nil {
 		os.Exit(1)
 	}
+}
+
+func buildFlagUsageMessage(args ...string) string {
+	return fmt.Sprintf("%s [%s (default), %s]", args[0], args[1], strings.Join(args[2:], ", "))
 }

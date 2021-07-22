@@ -11,7 +11,7 @@ func newRootCmd() *cobra.Command {
 		Short:   "Command line program to search images",
 		Args:    cobra.NoArgs,
 		Version: build.Version,
-		Run:     func(c *cobra.Command, args []string) {
+		Run: func(c *cobra.Command, args []string) {
 			_ = c.Usage()
 		},
 		SilenceUsage: true,

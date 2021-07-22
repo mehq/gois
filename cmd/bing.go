@@ -2,7 +2,8 @@ package cmd
 
 import (
 	"github.com/mzbaulhaque/gois/internal/util"
-	"github.com/mzbaulhaque/gois/pkg/scraper"
+	"github.com/mzbaulhaque/gois/pkg/scraper/params"
+	"github.com/mzbaulhaque/gois/pkg/scraper/services"
 
 	"github.com/spf13/cobra"
 )
@@ -15,27 +16,23 @@ func newBingCmd() *cobra.Command {
 		RunE: func(c *cobra.Command, args []string) error {
 			aspectRatio, _ := c.Flags().GetString("aspect-ratio")
 			compact, _ := c.Flags().GetBool("compact")
-			date, _ := c.Flags().GetString("date")
 			imageColor, _ := c.Flags().GetString("image-color")
 			imageSize, _ := c.Flags().GetString("image-size")
 			imageType, _ := c.Flags().GetString("image-type")
-			license, _ := c.Flags().GetString("license")
-			people, _ := c.Flags().GetString("people")
-			safeSearch, _ := c.Flags().GetString("region")
+			peopleFilter, _ := c.Flags().GetString("people-filter")
+			safeSearch, _ := c.Flags().GetString("safe-search")
 
-			config := &scraper.BingConfig{
-				AspectRatio: aspectRatio,
-				Compact:  compact,
-				Date: date,
-				ImageColor: imageColor,
-				ImageSize: imageSize,
-				ImageType: imageType,
-				License: license,
-				People: people,
-				Query:    args[0],
-				SafeSearch: safeSearch,
+			config := &services.BingConfig{
+				AspectRatio:  aspectRatio,
+				Compact:      compact,
+				ImageColor:   imageColor,
+				ImageSize:    imageSize,
+				ImageType:    imageType,
+				PeopleFilter: peopleFilter,
+				Query:        args[0],
+				SafeSearch:   safeSearch,
 			}
-			bs := &scraper.BingScraper{Config: config}
+			bs := &services.BingScraper{Config: config}
 			items, pages, err := bs.Scrape()
 
 			if err != nil {
@@ -48,15 +45,13 @@ func newBingCmd() *cobra.Command {
 		},
 	}
 
-	bingCmd.Flags().StringP("aspect-ratio", "A", "", "Specify the shape of images [any (default), square, wide, tall]")
+	bingCmd.Flags().String("aspect-ratio", "", buildFlagUsageMessage("Specify the shape of images", "all", params.AspectRatioTall, params.AspectRatioSquare, params.AspectRationWide))
 	bingCmd.PersistentFlags().BoolP("compact", "c", false, "Print original image link per line with no other information.")
-	bingCmd.Flags().StringP("date", "D", "", "Specify date of images [any (default), past-day, past-week, past-month, past-year]")
-	bingCmd.Flags().StringP("image-color", "C", "", "Find images in preferred color [any (default), full-color, black-white, red, orange, yellow, green, teal, blue, purple, pink, white, gray, black, brown]")
-	bingCmd.Flags().StringP("image-size", "S", "", "Find images in specific size [any (default), small, medium, large, extra-large or specific size e.g. 300_300]")
-	bingCmd.Flags().StringP("image-type", "T", "", "Limit the kind of images that you find [any (default), photo, clip-art, line-drawing, animated, transparent]")
-	bingCmd.Flags().StringP("license", "L", "", "License preference [all (default), creative-commons, public-domain, free-share-use, free-share-use-commercially, free-modify-share-use, free-modify-share-use-commercially]")
-	bingCmd.Flags().StringP("people", "P", "", "Apply people filter [any (default), face, head-shoulder]")
-	bingCmd.Flags().StringP("safe-search", "s", "on", "Tell SafeSearch whether to filter sexually explicit content [on (default), off, moderate]")
+	bingCmd.Flags().String("image-color", "", buildFlagUsageMessage("Find images in your preferred color", "all", params.ColorFull, params.ColorBlackAndWhite, params.ColorRed, params.ColorOrange, params.ColorYellow, params.ColorGreen, params.ColorTeal, params.ColorBlue, params.ColorPurple, params.ColorPink, params.ColorWhite, params.ColorGray, params.ColorBlack, params.ColorBrown))
+	bingCmd.Flags().String("image-size", "", buildFlagUsageMessage("Find images in specific size", "all", params.ImageSizeLarge, params.ImageSizeMedium, params.ImageSizeSmall, params.ImageSizeExtraLarge))
+	bingCmd.Flags().String("image-type", "", buildFlagUsageMessage("Limit the kind of images that you find", "all", params.ImageTypePhoto, params.ImageTypeClipArt, params.ImageTypeLineDrawing, params.ImageTypeAnimated, params.ImageTypeTransparent))
+	bingCmd.Flags().String("people-filter", "", buildFlagUsageMessage("Apply people filter", "all", params.ImageTypeFace, params.OrientationPortrait))
+	bingCmd.Flags().String("safe-search", "on", buildFlagUsageMessage("Tell SafeSearch whether to filter sexually explicit content", params.SafeSearchOn, params.SafeSearchOff, params.SafeSearchModerate))
 
 	return bingCmd
 }

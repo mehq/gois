@@ -6,7 +6,6 @@ import (
 	"text/template"
 )
 
-
 // PrintResults writes search result to stdout.
 func PrintResults(items []interface{}, pages int, compact bool) {
 	compactTmplText := "{{.URL}}\n"
