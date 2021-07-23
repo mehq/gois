@@ -32,7 +32,7 @@ type FlickrResult struct {
 	Width        int    `json:"width_o"`
 	Owner        string `json:"owner"`
 	ID           string `json:"id"`
-	ReferenceURL string `json:"ru"`
+	ReferenceURL string `json:"-"`
 	ThumbnailURL string `json:"url_t"`
 	Title        string `json:"title"`
 	URL          string `json:"url_o"`
