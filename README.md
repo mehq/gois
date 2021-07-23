@@ -22,6 +22,7 @@ Search images:
 
 ```shell
 gois bing "night sky" # using bing
+gois flickr "night sky" # using flickr
 gois google "night sky" # using google
 ```
 
@@ -31,3 +32,9 @@ Please note that **gois** currently does not support automatic downloading of im
 gois google -c "night sky" | xargs -I url curl --progress-bar --compressed --connect-timeout 10 --retry 3 -k -L -O url
 gois google -c "night sky" | wget -q --show-progress -c -nc -T 10 -t 3 -i-
 ```
+
+## Supported Services
+
+  * Bing
+  * Flickr
+  * Google
