@@ -54,9 +54,9 @@ func newFlickrCmd() *cobra.Command {
 	flickrCmd.Flags().String(
 		"image-color",
 		"",
-		buildFlagUsageMessage(
+		makeFlagUsageMessage(
 			"Find images in your preferred color",
-			"all",
+			params.ParamAll,
 			params.ColorRed,
 			params.ColorDarkOrange,
 			params.ColorOrange,
@@ -76,9 +76,9 @@ func newFlickrCmd() *cobra.Command {
 	flickrCmd.Flags().String(
 		"image-size",
 		"",
-		buildFlagUsageMessage(
+		makeFlagUsageMessage(
 			"Find images in specific size",
-			"all",
+			params.ParamAll,
 			params.ImageSizeLarge,
 			params.ImageSizeMedium,
 		),
@@ -86,9 +86,9 @@ func newFlickrCmd() *cobra.Command {
 	flickrCmd.Flags().String(
 		"image-type",
 		"",
-		buildFlagUsageMessage(
+		makeFlagUsageMessage(
 			"Limit the kind of images that you find",
-			"all",
+			params.ParamAll,
 			params.ColorBlackAndWhite,
 			params.ImageTypeShallowDepthOfField,
 			params.ImageTypeMinimal,
@@ -98,9 +98,9 @@ func newFlickrCmd() *cobra.Command {
 	flickrCmd.Flags().String(
 		"orientation",
 		"",
-		buildFlagUsageMessage(
+		makeFlagUsageMessage(
 			"Specify the orientation of images",
-			"all",
+			params.ParamAll,
 			params.OrientationLandscape,
 			params.OrientationPortrait,
 			params.AspectRatioSquare,
@@ -109,8 +109,8 @@ func newFlickrCmd() *cobra.Command {
 	)
 	flickrCmd.Flags().String(
 		"safe-search",
-		"on",
-		buildFlagUsageMessage(
+		"",
+		makeFlagUsageMessage(
 			"Tell SafeSearch whether to filter sexually explicit content",
 			params.SafeSearchOn,
 			params.SafeSearchOff,

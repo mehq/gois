@@ -43,98 +43,94 @@ type GoogleResult struct {
 func (g GoogleScraper) makeFilterString() (string, error) {
 	filters := make([]string, 0)
 
-	if g.Config.AspectRatio != "" {
-		switch g.Config.AspectRatio {
-		case params.AspectRatioTall:
-			filters = append(filters, "iar:t")
-		case params.AspectRatioSquare:
-			filters = append(filters, "iar:s")
-		case params.AspectRationWide:
-			filters = append(filters, "iar:w")
-		case params.AspectRatioPanoramic:
-			filters = append(filters, "iar:xw")
-		default:
-			return "", fmt.Errorf("--aspect-ratio: invalid value %s", g.Config.AspectRatio)
-		}
+	switch g.Config.AspectRatio {
+	case "", params.ParamAll:
+	case params.AspectRatioTall:
+		filters = append(filters, "iar:t")
+	case params.AspectRatioSquare:
+		filters = append(filters, "iar:s")
+	case params.AspectRationWide:
+		filters = append(filters, "iar:w")
+	case params.AspectRatioPanoramic:
+		filters = append(filters, "iar:xw")
+	default:
+		return "", fmt.Errorf("--aspect-ratio: invalid value %s", g.Config.AspectRatio)
 	}
 
-	if g.Config.ImageColor != "" {
-		switch g.Config.ImageColor {
-		case params.ColorFull:
-			filters = append(filters, "ic:color")
-		case params.ColorBlackAndWhite:
-			filters = append(filters, "ic:gray")
-		case params.ImageTypeTransparent:
-			filters = append(filters, "ic:trans")
-		case params.ColorRed:
-			filters = append(filters, "ic:specific")
-			filters = append(filters, "isc:red")
-		case params.ColorOrange:
-			filters = append(filters, "ic:specific")
-			filters = append(filters, "isc:orange")
-		case params.ColorYellow:
-			filters = append(filters, "ic:specific")
-			filters = append(filters, "isc:yellow")
-		case params.ColorGreen:
-			filters = append(filters, "ic:specific")
-			filters = append(filters, "isc:green")
-		case params.ColorTeal:
-			filters = append(filters, "ic:specific")
-			filters = append(filters, "isc:teal")
-		case params.ColorBlue:
-			filters = append(filters, "ic:specific")
-			filters = append(filters, "isc:blue")
-		case params.ColorPurple:
-			filters = append(filters, "ic:specific")
-			filters = append(filters, "isc:purple")
-		case params.ColorPink:
-			filters = append(filters, "ic:specific")
-			filters = append(filters, "isc:pink")
-		case params.ColorWhite:
-			filters = append(filters, "ic:specific")
-			filters = append(filters, "isc:white")
-		case params.ColorGray:
-			filters = append(filters, "ic:specific")
-			filters = append(filters, "isc:gray")
-		case params.ColorBlack:
-			filters = append(filters, "ic:specific")
-			filters = append(filters, "isc:black")
-		case params.ColorBrown:
-			filters = append(filters, "ic:specific")
-			filters = append(filters, "isc:brown")
-		default:
-			return "", fmt.Errorf("--image-color: invalid value %s", g.Config.ImageColor)
-		}
+	switch g.Config.ImageColor {
+	case "", params.ParamAll:
+	case params.ColorFull:
+		filters = append(filters, "ic:color")
+	case params.ColorBlackAndWhite:
+		filters = append(filters, "ic:gray")
+	case params.ImageTypeTransparent:
+		filters = append(filters, "ic:trans")
+	case params.ColorRed:
+		filters = append(filters, "ic:specific")
+		filters = append(filters, "isc:red")
+	case params.ColorOrange:
+		filters = append(filters, "ic:specific")
+		filters = append(filters, "isc:orange")
+	case params.ColorYellow:
+		filters = append(filters, "ic:specific")
+		filters = append(filters, "isc:yellow")
+	case params.ColorGreen:
+		filters = append(filters, "ic:specific")
+		filters = append(filters, "isc:green")
+	case params.ColorTeal:
+		filters = append(filters, "ic:specific")
+		filters = append(filters, "isc:teal")
+	case params.ColorBlue:
+		filters = append(filters, "ic:specific")
+		filters = append(filters, "isc:blue")
+	case params.ColorPurple:
+		filters = append(filters, "ic:specific")
+		filters = append(filters, "isc:purple")
+	case params.ColorPink:
+		filters = append(filters, "ic:specific")
+		filters = append(filters, "isc:pink")
+	case params.ColorWhite:
+		filters = append(filters, "ic:specific")
+		filters = append(filters, "isc:white")
+	case params.ColorGray:
+		filters = append(filters, "ic:specific")
+		filters = append(filters, "isc:gray")
+	case params.ColorBlack:
+		filters = append(filters, "ic:specific")
+		filters = append(filters, "isc:black")
+	case params.ColorBrown:
+		filters = append(filters, "ic:specific")
+		filters = append(filters, "isc:brown")
+	default:
+		return "", fmt.Errorf("--image-color: invalid value %s", g.Config.ImageColor)
 	}
 
-	if g.Config.ImageSize != "" {
-		switch g.Config.ImageSize {
-		case params.ImageSizeLarge:
-			filters = append(filters, "isz:l")
-		case params.ImageSizeMedium:
-			filters = append(filters, "isz:m")
-		case params.ImageSizeIcon:
-			filters = append(filters, "isz:i")
-		default:
-			return "", fmt.Errorf("--image-size: invalid value %s", g.Config.ImageSize)
-		}
+	switch g.Config.ImageSize {
+	case "", params.ParamAll:
+	case params.ImageSizeLarge:
+		filters = append(filters, "isz:l")
+	case params.ImageSizeMedium:
+		filters = append(filters, "isz:m")
+	case params.ImageSizeIcon:
+		filters = append(filters, "isz:i")
+	default:
+		return "", fmt.Errorf("--image-size: invalid value %s", g.Config.ImageSize)
 	}
 
-	if g.Config.ImageType != "" {
-		switch g.Config.ImageType {
-		case params.ImageTypeFace:
-			filters = append(filters, "itp:face")
-		case params.ImageTypePhoto:
-			filters = append(filters, "itp:photo")
-		case params.ImageTypeClipArt:
-			filters = append(filters, "itp:clipart")
-		case params.ImageTypeLineDrawing:
-			filters = append(filters, "itp:lineart")
-		case params.ImageTypeAnimated:
-			filters = append(filters, "itp:animated")
-		default:
-			return "", fmt.Errorf("--image-type: invalid value %s", g.Config.ImageType)
-		}
+	switch g.Config.ImageType {
+	case "", params.ParamAll:
+	case params.ImageTypeFace:
+		filters = append(filters, "itp:face")
+	case params.ImageTypePhoto:
+		filters = append(filters, "itp:photo")
+	case params.ImageTypeClipArt:
+		filters = append(filters, "itp:clipart")
+	case params.ImageTypeLineDrawing:
+		filters = append(filters, "itp:lineart")
+	case params.ImageTypeAnimated:
+		filters = append(filters, "itp:animated")
+	default:
+		return "", fmt.Errorf("--image-type: invalid value %s", g.Config.ImageType)
 	}
 
 	return strings.Join(filters, ","), nil
@@ -164,7 +160,7 @@ func (g GoogleScraper) Scrape() ([]interface{}, int, error) {
 	switch g.Config.SafeSearch {
 	case params.SafeSearchOff:
 		qParams["safe"] = "images"
-	case params.SafeSearchOn:
+	case "", params.SafeSearchOn:
 		qParams["safe"] = "active"
 	default:
 		return nil, 0, fmt.Errorf("--safe-search: invalid value %s", g.Config.SafeSearch)

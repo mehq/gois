@@ -15,18 +15,17 @@ var defaultHeaders = map[string]string{
 	"upgrade-insecure-requests": "1",
 }
 
-var httpClient *http.Client = nil
+type HTTPClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
 
-func getHttpClient() *http.Client {
-	if httpClient == nil {
-		jar, _ := cookiejar.New(nil)
+var Client HTTPClient
 
-		httpClient = &http.Client{
-			Jar: jar,
-		}
+func init() {
+	jar, _ := cookiejar.New(nil)
+	Client = &http.Client{
+		Jar: jar,
 	}
-
-	return httpClient
 }
 
 // DownloadWebpage downloads a webpage and returns content as byte array if successful. An error is returned
@@ -59,13 +58,7 @@ func DownloadWebpage(
 
 	req.URL.RawQuery = q.Encode()
 
-	client := getHttpClient()
-
-	defer func() {
-		client.CloseIdleConnections()
-	}()
-
-	res, err := client.Do(req)
+	res, err := Client.Do(req)
 
 	if err != nil {
 		return nil, fmt.Errorf("error performing request: %v", err)

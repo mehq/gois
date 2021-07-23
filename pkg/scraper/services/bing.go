@@ -44,95 +44,90 @@ type BingResult struct {
 func (b BingScraper) makeFilterString() (string, error) {
 	filters := make([]string, 0)
 
-	if b.Config.AspectRatio != "" {
-		switch b.Config.AspectRatio {
-		case params.AspectRatioSquare:
-			filters = append(filters, "filterui:aspect-square")
-		case params.AspectRationWide:
-			filters = append(filters, "filterui:aspect-wide")
-		case params.AspectRatioTall:
-			filters = append(filters, "filterui:aspect-tall")
-		default:
-			return "", fmt.Errorf("--aspect-ratio: invalid value %s", b.Config.AspectRatio)
-		}
+	switch b.Config.AspectRatio {
+	case "", params.ParamAll:
+	case params.AspectRatioSquare:
+		filters = append(filters, "filterui:aspect-square")
+	case params.AspectRationWide:
+		filters = append(filters, "filterui:aspect-wide")
+	case params.AspectRatioTall:
+		filters = append(filters, "filterui:aspect-tall")
+	default:
+		return "", fmt.Errorf("--aspect-ratio: invalid value %s", b.Config.AspectRatio)
 	}
 
-	if b.Config.ImageColor != "" {
-		switch b.Config.ImageColor {
-		case params.ColorFull:
-			filters = append(filters, "filterui:color2-color")
-		case params.ColorBlackAndWhite:
-			filters = append(filters, "filterui:color2-bw")
-		case params.ColorRed:
-			filters = append(filters, "filterui:color2-FGcls_RED")
-		case params.ColorOrange:
-			filters = append(filters, "filterui:color2-FGcls_ORANGE")
-		case params.ColorYellow:
-			filters = append(filters, "filterui:color2-FGcls_YELLOW")
-		case params.ColorGreen:
-			filters = append(filters, "filterui:color2-FGcls_GREEN")
-		case params.ColorTeal:
-			filters = append(filters, "filterui:color2-FGcls_TEAL")
-		case params.ColorBlue:
-			filters = append(filters, "filterui:color2-FGcls_BLUE")
-		case params.ColorPurple:
-			filters = append(filters, "filterui:color2-FGcls_PURPLE")
-		case params.ColorPink:
-			filters = append(filters, "filterui:color2-FGcls_PINK")
-		case params.ColorBrown:
-			filters = append(filters, "filterui:color2-FGcls_BROWN")
-		case params.ColorBlack:
-			filters = append(filters, "filterui:color2-FGcls_BLACK")
-		case params.ColorGray:
-			filters = append(filters, "filterui:color2-FGcls_GRAY")
-		case params.ColorWhite:
-			filters = append(filters, "filterui:color2-FGcls_WHITE")
-		default:
-			return "", fmt.Errorf("--image-color: invalid value %s", b.Config.ImageColor)
-		}
+	switch b.Config.ImageColor {
+	case "", params.ParamAll:
+	case params.ColorFull:
+		filters = append(filters, "filterui:color2-color")
+	case params.ColorBlackAndWhite:
+		filters = append(filters, "filterui:color2-bw")
+	case params.ColorRed:
+		filters = append(filters, "filterui:color2-FGcls_RED")
+	case params.ColorOrange:
+		filters = append(filters, "filterui:color2-FGcls_ORANGE")
+	case params.ColorYellow:
+		filters = append(filters, "filterui:color2-FGcls_YELLOW")
+	case params.ColorGreen:
+		filters = append(filters, "filterui:color2-FGcls_GREEN")
+	case params.ColorTeal:
+		filters = append(filters, "filterui:color2-FGcls_TEAL")
+	case params.ColorBlue:
+		filters = append(filters, "filterui:color2-FGcls_BLUE")
+	case params.ColorPurple:
+		filters = append(filters, "filterui:color2-FGcls_PURPLE")
+	case params.ColorPink:
+		filters = append(filters, "filterui:color2-FGcls_PINK")
+	case params.ColorBrown:
+		filters = append(filters, "filterui:color2-FGcls_BROWN")
+	case params.ColorBlack:
+		filters = append(filters, "filterui:color2-FGcls_BLACK")
+	case params.ColorGray:
+		filters = append(filters, "filterui:color2-FGcls_GRAY")
+	case params.ColorWhite:
+		filters = append(filters, "filterui:color2-FGcls_WHITE")
+	default:
+		return "", fmt.Errorf("--image-color: invalid value %s", b.Config.ImageColor)
 	}
 
-	if b.Config.ImageSize != "" {
-		switch b.Config.ImageSize {
-		case params.ImageSizeSmall:
-			filters = append(filters, "filterui:imagesize-small")
-		case params.ImageSizeMedium:
-			filters = append(filters, "filterui:imagesize-medium")
-		case params.ImageSizeLarge:
-			filters = append(filters, "filterui:imagesize-large")
-		case params.ImageSizeExtraLarge:
-			filters = append(filters, "filterui:imagesize-wallpaper")
-		default:
-			return "", fmt.Errorf("--image-size: invalid value %s", b.Config.ImageSize)
-		}
+	switch b.Config.ImageSize {
+	case "", params.ParamAll:
+	case params.ImageSizeSmall:
+		filters = append(filters, "filterui:imagesize-small")
+	case params.ImageSizeMedium:
+		filters = append(filters, "filterui:imagesize-medium")
+	case params.ImageSizeLarge:
+		filters = append(filters, "filterui:imagesize-large")
+	case params.ImageSizeExtraLarge:
+		filters = append(filters, "filterui:imagesize-wallpaper")
+	default:
+		return "", fmt.Errorf("--image-size: invalid value %s", b.Config.ImageSize)
 	}
 
-	if b.Config.ImageType != "" {
-		switch b.Config.ImageType {
-		case params.ImageTypePhoto:
-			filters = append(filters, "filterui:photo-photo")
-		case params.ImageTypeClipArt:
-			filters = append(filters, "filterui:photo-clipart")
-		case params.ImageTypeLineDrawing:
-			filters = append(filters, "filterui:photo-linedrawing")
-		case params.ImageTypeAnimated:
-			filters = append(filters, "filterui:photo-animatedgif")
-		case params.ImageTypeTransparent:
-			filters = append(filters, "filterui:photo-transparent")
-		default:
-			return "", fmt.Errorf("--image-type: invalid value %s", b.Config.ImageType)
-		}
+	switch b.Config.ImageType {
+	case "", params.ParamAll:
+	case params.ImageTypePhoto:
+		filters = append(filters, "filterui:photo-photo")
+	case params.ImageTypeClipArt:
+		filters = append(filters, "filterui:photo-clipart")
+	case params.ImageTypeLineDrawing:
+		filters = append(filters, "filterui:photo-linedrawing")
+	case params.ImageTypeAnimated:
+		filters = append(filters, "filterui:photo-animatedgif")
+	case params.ImageTypeTransparent:
+		filters = append(filters, "filterui:photo-transparent")
+	default:
+		return "", fmt.Errorf("--image-type: invalid value %s", b.Config.ImageType)
 	}
 
-	if b.Config.PeopleFilter != "" {
-		switch b.Config.PeopleFilter {
-		case params.ImageTypeFace:
-			filters = append(filters, "filterui:face-face")
-		case params.OrientationPortrait:
-			filters = append(filters, "filterui:face-portrait")
-		default:
-			return "", fmt.Errorf("--people-filter: invalid value %s", b.Config.PeopleFilter)
-		}
+	switch b.Config.PeopleFilter {
+	case "", params.ParamAll:
+	case params.ImageTypeFace:
+		filters = append(filters, "filterui:face-face")
+	case params.OrientationPortrait:
+		filters = append(filters, "filterui:face-portrait")
+	default:
+		return "", fmt.Errorf("--people-filter: invalid value %s", b.Config.PeopleFilter)
 	}
 
 	return strings.Join(filters, "+"), nil
@@ -179,7 +174,7 @@ func (b BingScraper) setSafeSearchSetting() error {
 	switch b.Config.SafeSearch {
 	case params.SafeSearchOff:
 		safeSearchOption = "off"
-	case params.SafeSearchOn:
+	case "", params.SafeSearchOn:
 		safeSearchOption = "strict"
 	case params.SafeSearchModerate:
 		safeSearchOption = "demote"

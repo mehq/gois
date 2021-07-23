@@ -50,9 +50,9 @@ func newBingCmd() *cobra.Command {
 	bingCmd.Flags().String(
 		"aspect-ratio",
 		"",
-		buildFlagUsageMessage(
+		makeFlagUsageMessage(
 			"Specify the shape of images",
-			"all",
+			params.ParamAll,
 			params.AspectRatioTall,
 			params.AspectRatioSquare,
 			params.AspectRationWide,
@@ -67,9 +67,9 @@ func newBingCmd() *cobra.Command {
 	bingCmd.Flags().String(
 		"image-color",
 		"",
-		buildFlagUsageMessage(
+		makeFlagUsageMessage(
 			"Find images in your preferred color",
-			"all",
+			params.ParamAll,
 			params.ColorFull,
 			params.ColorBlackAndWhite,
 			params.ColorRed,
@@ -89,9 +89,9 @@ func newBingCmd() *cobra.Command {
 	bingCmd.Flags().String(
 		"image-size",
 		"",
-		buildFlagUsageMessage(
+		makeFlagUsageMessage(
 			"Find images in specific size",
-			"all",
+			params.ParamAll,
 			params.ImageSizeLarge,
 			params.ImageSizeMedium,
 			params.ImageSizeSmall,
@@ -101,9 +101,9 @@ func newBingCmd() *cobra.Command {
 	bingCmd.Flags().String(
 		"image-type",
 		"",
-		buildFlagUsageMessage(
+		makeFlagUsageMessage(
 			"Limit the kind of images that you find",
-			"all",
+			params.ParamAll,
 			params.ImageTypePhoto,
 			params.ImageTypeClipArt,
 			params.ImageTypeLineDrawing,
@@ -114,17 +114,17 @@ func newBingCmd() *cobra.Command {
 	bingCmd.Flags().String(
 		"people-filter",
 		"",
-		buildFlagUsageMessage(
+		makeFlagUsageMessage(
 			"Apply people filter",
-			"all",
+			params.ParamAll,
 			params.ImageTypeFace,
 			params.OrientationPortrait,
 		),
 	)
 	bingCmd.Flags().String(
 		"safe-search",
-		"on",
-		buildFlagUsageMessage(
+		"",
+		makeFlagUsageMessage(
 			"Tell SafeSearch whether to filter sexually explicit content",
 			params.SafeSearchOn,
 			params.SafeSearchOff,

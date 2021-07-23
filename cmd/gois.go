@@ -26,6 +26,6 @@ func Execute() {
 	}
 }
 
-func buildFlagUsageMessage(args ...string) string {
+func makeFlagUsageMessage(args ...string) string {
 	return fmt.Sprintf("%s [%s (default), %s]", args[0], args[1], strings.Join(args[2:], ", "))
 }

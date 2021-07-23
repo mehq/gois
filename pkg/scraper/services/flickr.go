@@ -52,86 +52,82 @@ type flickrResponse struct {
 func (f FlickrScraper) getFilters() (map[string]string, error) {
 	filters := map[string]string{}
 
-	if f.Config.ImageColor != "" {
-		switch f.Config.ImageColor {
-		case params.ColorRed:
-			filters["color_codes"] = "0"
-		case params.ColorDarkOrange:
-			filters["color_codes"] = "1"
-		case params.ColorOrange:
-			filters["color_codes"] = "2"
-		case params.ColorPalePink:
-			filters["color_codes"] = "b"
-		case params.ColorLemonYellow:
-			filters["color_codes"] = "4"
-		case params.ColorSchoolBusYellow:
-			filters["color_codes"] = "3"
-		case params.ColorGreen:
-			filters["color_codes"] = "5"
-		case params.ColorDarkLimeGreen:
-			filters["color_codes"] = "6"
-		case params.ColorCyan:
-			filters["color_codes"] = "7"
-		case params.ColorBlue:
-			filters["color_codes"] = "8"
-		case params.ColorViolet:
-			filters["color_codes"] = "9"
-		case params.ColorPink:
-			filters["color_codes"] = "a"
-		case params.ColorWhite:
-			filters["color_codes"] = "c"
-		case params.ColorGray:
-			filters["color_codes"] = "d"
-		case params.ColorBlack:
-			filters["color_codes"] = "e"
-		default:
-			return nil, fmt.Errorf("--image-color: invalid value %s", f.Config.ImageColor)
-		}
+	switch f.Config.ImageColor {
+	case "", params.ParamAll:
+	case params.ColorRed:
+		filters["color_codes"] = "0"
+	case params.ColorDarkOrange:
+		filters["color_codes"] = "1"
+	case params.ColorOrange:
+		filters["color_codes"] = "2"
+	case params.ColorPalePink:
+		filters["color_codes"] = "b"
+	case params.ColorLemonYellow:
+		filters["color_codes"] = "4"
+	case params.ColorSchoolBusYellow:
+		filters["color_codes"] = "3"
+	case params.ColorGreen:
+		filters["color_codes"] = "5"
+	case params.ColorDarkLimeGreen:
+		filters["color_codes"] = "6"
+	case params.ColorCyan:
+		filters["color_codes"] = "7"
+	case params.ColorBlue:
+		filters["color_codes"] = "8"
+	case params.ColorViolet:
+		filters["color_codes"] = "9"
+	case params.ColorPink:
+		filters["color_codes"] = "a"
+	case params.ColorWhite:
+		filters["color_codes"] = "c"
+	case params.ColorGray:
+		filters["color_codes"] = "d"
+	case params.ColorBlack:
+		filters["color_codes"] = "e"
+	default:
+		return nil, fmt.Errorf("--image-color: invalid value %s", f.Config.ImageColor)
 	}
 
-	if f.Config.ImageSize != "" {
-		switch f.Config.ImageSize {
-		case params.ImageSizeMedium:
-			filters["dimension_search_mode"] = "min"
-			filters["height"] = "640"
-			filters["width"] = "640"
-		case params.ImageSizeLarge:
-			filters["dimension_search_mode"] = "min"
-			filters["height"] = "1024"
-			filters["width"] = "1024"
-		default:
-			return nil, fmt.Errorf("--image-size: invalid value %s", f.Config.ImageSize)
-		}
+	switch f.Config.ImageSize {
+	case "", params.ParamAll:
+	case params.ImageSizeMedium:
+		filters["dimension_search_mode"] = "min"
+		filters["height"] = "640"
+		filters["width"] = "640"
+	case params.ImageSizeLarge:
+		filters["dimension_search_mode"] = "min"
+		filters["height"] = "1024"
+		filters["width"] = "1024"
+	default:
+		return nil, fmt.Errorf("--image-size: invalid value %s", f.Config.ImageSize)
 	}
 
-	if f.Config.ImageType != "" {
-		switch f.Config.ImageType {
-		case params.ColorBlackAndWhite:
-			filters["styles"] = "blackandwhite"
-		case params.ImageTypeShallowDepthOfField:
-			filters["styles"] = "depthoffield"
-		case params.ImageTypeMinimal:
-			filters["styles"] = "minimalism"
-		case params.ImageTypePatterns:
-			filters["styles"] = "pattern"
-		default:
-			return nil, fmt.Errorf("--image-type: invalid value %s", f.Config.ImageType)
-		}
+	switch f.Config.ImageType {
+	case "", params.ParamAll:
+	case params.ColorBlackAndWhite:
+		filters["styles"] = "blackandwhite"
+	case params.ImageTypeShallowDepthOfField:
+		filters["styles"] = "depthoffield"
+	case params.ImageTypeMinimal:
+		filters["styles"] = "minimalism"
+	case params.ImageTypePatterns:
+		filters["styles"] = "pattern"
+	default:
+		return nil, fmt.Errorf("--image-type: invalid value %s", f.Config.ImageType)
 	}
 
-	if f.Config.Orientation != "" {
-		switch f.Config.Orientation {
-		case params.OrientationLandscape:
-			filters["orientation"] = "landscape"
-		case params.OrientationPortrait:
-			filters["orientation"] = "portrait"
-		case params.AspectRatioSquare:
-			filters["orientation"] = "square"
-		case params.AspectRatioPanoramic:
-			filters["orientation"] = "panorama"
-		default:
-			return nil, fmt.Errorf("--orientation: invalid value %s", f.Config.Orientation)
-		}
+	switch f.Config.Orientation {
+	case "", params.ParamAll:
+	case params.OrientationLandscape:
+		filters["orientation"] = "landscape"
+	case params.OrientationPortrait:
+		filters["orientation"] = "portrait"
+	case params.AspectRatioSquare:
+		filters["orientation"] = "square"
+	case params.AspectRatioPanoramic:
+		filters["orientation"] = "panorama"
+	default:
+		return nil, fmt.Errorf("--orientation: invalid value %s", f.Config.Orientation)
 	}
 
 	return filters, nil

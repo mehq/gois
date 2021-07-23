@@ -1,4 +1,4 @@
-// +build !main
+// E2E testing.
 
 package main
 
@@ -31,11 +31,12 @@ func TestMain(m *testing.M) {
 
 // setup any prerequisites for the tests.
 func setup() {
-	cmd := exec.Command("go", "build", "-o", goisBinaryAbsPath)
+	// Build test binary with mocked data.
+	cmd := exec.Command("go", "build", "-tags", "test", "-o", goisBinaryAbsPath)
 	output, err := cmd.Output()
 
 	if err != nil {
-		log.Fatal(err, string(output))
+		log.Fatalf("error building test binary: %v (%s)", err, string(output))
 	}
 }
 
@@ -48,7 +49,11 @@ func TestGois(t *testing.T) {
 			Out: nil,
 		},
 		{
-			In:  []string{"google", "dogs"},
+			In:  []string{"flickr", "cats"},
+			Out: nil,
+		},
+		{
+			In:  []string{"google", "cats"},
 			Out: nil,
 		},
 	}
@@ -70,7 +75,11 @@ func TestGois_Compact(t *testing.T) {
 			Out: nil,
 		},
 		{
-			In:  []string{"google", "-c", "dogs"},
+			In:  []string{"flickr", "-c", "cats"},
+			Out: nil,
+		},
+		{
+			In:  []string{"google", "-c", "cats"},
 			Out: nil,
 		},
 	}

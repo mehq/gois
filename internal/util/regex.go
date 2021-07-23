@@ -20,7 +20,7 @@ func SearchRegex(expr string, target string, name string, fatal bool) (string, e
 
 	subMatch := r.FindStringSubmatch(target)
 
-	if subMatch == nil {
+	if subMatch == nil || len(subMatch) < 2 {
 		return "", fmt.Errorf("cannot parse %s", name)
 	}
 

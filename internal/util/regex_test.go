@@ -1,5 +1,3 @@
-// +build !regex
-
 package util
 
 import (
@@ -9,11 +7,20 @@ import (
 func TestSearchRegex(t *testing.T) {
 	var testCases = []TestCase{
 		{
-			In:  map[string]string{
-				"expr": "w([^d]+)d",
+			In: map[string]string{
+				"expr":   "",
+				"target": "",
+				"name":   "",
+				"fatal":  "true",
+			},
+			Out: "",
+		},
+		{
+			In: map[string]string{
+				"expr":   "w([^d]+)d",
 				"target": "hello world",
-				"name": "",
-				"fatal": "false",
+				"name":   "",
+				"fatal":  "false",
 			},
 			Out: "orl",
 		},
