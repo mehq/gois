@@ -1,0 +1,3 @@
+ignore:
+  - "internal/util/out.go"
+  - "internal/util/testutil.go"
