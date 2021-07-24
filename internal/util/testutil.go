@@ -35,7 +35,7 @@ var (
 	ResponseBingImageAsync   []byte
 	ResponseBingImagesSearch []byte
 	ResponseBingSettings     []byte
-	ResponseExample          = []byte("dummy response")
+	ResponseExample          []byte
 	ResponseFlickrSearch     []byte
 	ResponseFlickrSearchAPI  []byte
 	ResponseGoogleSearch     []byte
@@ -55,6 +55,11 @@ func RegisterMockHTTPClient() {
 	Client = &MockClient{
 		MockDo: func(req *http.Request) (*http.Response, error) {
 			url := req.URL.String()
+
+			if strings.Contains(url, "test-do-error") {
+				return nil, fmt.Errorf("dummy error")
+			}
+
 			var body io.ReadCloser
 
 			switch {
@@ -64,18 +69,14 @@ func RegisterMockHTTPClient() {
 				body = ioutil.NopCloser(bytes.NewReader(ResponseBingImagesSearch))
 			case strings.HasPrefix(url, "https://www.bing.com/settings.aspx"):
 				body = ioutil.NopCloser(bytes.NewReader(ResponseBingSettings))
+			case strings.HasPrefix(url, "https://www.example.com"):
+				body = ioutil.NopCloser(bytes.NewReader(ResponseExample))
 			case strings.HasPrefix(url, "https://www.flickr.com/search"):
 				body = ioutil.NopCloser(bytes.NewReader(ResponseFlickrSearch))
 			case strings.HasPrefix(url, "https://api.flickr.com/services/rest"):
 				body = ioutil.NopCloser(bytes.NewReader(ResponseFlickrSearchAPI))
 			case strings.HasPrefix(url, "https://www.google.com/search"):
 				body = ioutil.NopCloser(bytes.NewReader(ResponseGoogleSearch))
-			case strings.HasPrefix(url, "https://www.example.com"):
-				body = ioutil.NopCloser(bytes.NewReader(ResponseExample))
-			}
-
-			if body == nil {
-				return nil, fmt.Errorf("empty body, url prefix not mocked")
 			}
 
 			return &http.Response{

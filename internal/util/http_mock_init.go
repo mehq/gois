@@ -21,11 +21,9 @@ func init() {
 		panic(err)
 	}
 
-	ResponseBingSettings, err = ioutil.ReadFile("testdata/bing_settings")
+	ResponseBingSettings = []byte("dummy response")
 
-	if err != nil {
-		panic(err)
-	}
+	ResponseExample = []byte("dummy response")
 
 	ResponseFlickrSearch, err = ioutil.ReadFile("testdata/flickr_search")
 

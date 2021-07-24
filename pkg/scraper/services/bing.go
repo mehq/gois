@@ -278,13 +278,13 @@ func (b BingScraper) Scrape() ([]interface{}, int, error) {
 				return nil, 0, fmt.Errorf("attribute 'href' does not exist on target element")
 			}
 
-			height, err := util.SearchRegex("exph=([0-9]+)", hrefAttr, "height", true)
+			height, err := util.SearchRegex("exph=([0-9]+)", hrefAttr, "height")
 
 			if err != nil {
 				return nil, 0, fmt.Errorf("%v", err)
 			}
 
-			width, err := util.SearchRegex("expw=([0-9]+)", hrefAttr, "width", true)
+			width, err := util.SearchRegex("expw=([0-9]+)", hrefAttr, "width")
 
 			if err != nil {
 				return nil, 0, fmt.Errorf("%v", err)

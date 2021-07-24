@@ -10,8 +10,13 @@ func TestSearchRegex(t *testing.T) {
 			In: map[string]string{
 				"expr":   "",
 				"target": "",
-				"name":   "",
-				"fatal":  "true",
+			},
+			Out: "",
+		},
+		{
+			In: map[string]string{
+				"expr":   "[", // invalid pattern
+				"target": "",
 			},
 			Out: "",
 		},
@@ -19,8 +24,6 @@ func TestSearchRegex(t *testing.T) {
 			In: map[string]string{
 				"expr":   "w([^d]+)d",
 				"target": "hello world",
-				"name":   "",
-				"fatal":  "false",
 			},
 			Out: "orl",
 		},
@@ -29,18 +32,12 @@ func TestSearchRegex(t *testing.T) {
 	for _, test := range testCases {
 		input := test.In.(map[string]string)
 		expectedOutput := test.Out.(string)
-		fatal := true
-
-		if input["fatal"] == "false" {
-			fatal = false
-		}
-
-		output, err := SearchRegex(input["expr"], input["target"], input["name"], fatal)
+		output, err := SearchRegex(input["expr"], input["target"], "")
 
 		if expectedOutput == "" && err == nil {
-			t.Errorf("should raise an error")
+			t.Errorf("should return an error")
 		} else if expectedOutput != "" && expectedOutput != output {
-			t.Errorf("expected %s, got %s", expectedOutput, output)
+			t.Errorf("expected '%s', got '%s'", expectedOutput, output)
 		}
 	}
 }

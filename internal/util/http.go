@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
+	"time"
 )
 
 var defaultHeaders = map[string]string{
@@ -24,7 +25,8 @@ var Client HTTPClient
 func init() {
 	jar, _ := cookiejar.New(nil)
 	Client = &http.Client{
-		Jar: jar,
+		Jar:     jar,
+		Timeout: 15 * time.Second,
 	}
 }
 
@@ -36,11 +38,7 @@ func DownloadWebpage(
 	headers map[string]string,
 	params map[string]string,
 ) ([]byte, error) {
-	req, err := http.NewRequest("GET", pageUrl, nil)
-
-	if err != nil {
-		return nil, fmt.Errorf("http request error: %v", err)
-	}
+	req, _ := http.NewRequest("GET", pageUrl, nil)
 
 	for k, v := range defaultHeaders {
 		req.Header.Add(k, v)
@@ -65,22 +63,14 @@ func DownloadWebpage(
 	}
 
 	defer func() {
-		err := res.Body.Close()
-
-		if err != nil {
-			panic(err)
-		}
+		_ = res.Body.Close()
 	}()
 
 	if res.StatusCode != expectedStatus {
 		return nil, fmt.Errorf("got status %d, expected %d", res.StatusCode, expectedStatus)
 	}
 
-	content, err := ioutil.ReadAll(res.Body)
-
-	if err != nil {
-		return nil, fmt.Errorf("error reading response body: %v", err)
-	}
+	content, _ := ioutil.ReadAll(res.Body)
 
 	return content, nil
 }

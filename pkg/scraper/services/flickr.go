@@ -146,7 +146,6 @@ func (f FlickrScraper) getAPIKey() (string, error) {
 		"root.YUI_config.flickr.api.site_key\\s*=\\s*\"([a-z0-9]+)\"",
 		string(page),
 		"apiKey",
-		true,
 	)
 
 	if err != nil {
