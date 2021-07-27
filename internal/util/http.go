@@ -22,7 +22,7 @@ type HTTPClient interface {
 }
 
 var (
-	jar *cookiejar.Jar
+	jar    *cookiejar.Jar
 	Client HTTPClient
 )
 
@@ -34,13 +34,13 @@ func init() {
 	}
 }
 
-func SetCookie(name, value, path, domain, forUrl string)  {
+func SetCookie(name, value, path, domain, forUrl string) {
 	u, _ := url.Parse(forUrl)
 	jar.SetCookies(u, []*http.Cookie{
 		{
-			Name: name,
-			Value: value,
-			Path: path,
+			Name:   name,
+			Value:  value,
+			Path:   path,
 			Domain: domain,
 		},
 	})

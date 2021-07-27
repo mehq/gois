@@ -24,6 +24,7 @@ Search images:
 gois bing "night sky" # using bing
 gois flickr "night sky" # using flickr
 gois google "night sky" # using google
+gois yahoo "night sky" # using yahoo
 ```
 
 Please note that **gois** currently does not support automatic downloading of images. But you can easily do that using output from **gois** and piping that to **curl**/**wget**.
@@ -38,3 +39,4 @@ gois google -c "night sky" | wget -q --show-progress -c -nc -T 10 -t 3 -i-
   * Bing
   * Flickr
   * Google
+  * Yahoo
