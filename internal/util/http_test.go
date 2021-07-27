@@ -2,12 +2,17 @@ package util
 
 import (
 	"net/http"
+	"os"
 	"testing"
 )
 
-func TestDownloadWebpage(t *testing.T) {
+func TestMain(m *testing.M) {
 	RegisterMockHTTPClient()
 
+	os.Exit(m.Run())
+}
+
+func TestDownloadWebpage(t *testing.T) {
 	// test download
 	url := "https://www.example.com"
 	_, err := DownloadWebpage(url, http.StatusOK, nil, nil)
@@ -46,5 +51,23 @@ func TestDownloadWebpage(t *testing.T) {
 
 	if err == nil {
 		t.Errorf("should return error after Do method execution")
+	}
+}
+
+func TestSetCookie(t *testing.T) {
+	SetCookie(
+		"dummy-cookie",
+		"dummy-value",
+		"/",
+		".example.com",
+		"https://www.example.com",
+	)
+
+	// test download after setting cookie
+	url := "https://www.example.com"
+	_, err := DownloadWebpage(url, http.StatusOK, nil, nil)
+
+	if err != nil {
+		t.Errorf("cannot download webpage after setting cookie: %v", err)
 	}
 }
