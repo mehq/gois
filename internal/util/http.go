@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
+	"net/url"
 	"time"
 )
 
@@ -20,14 +21,29 @@ type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
-var Client HTTPClient
+var (
+	jar    *cookiejar.Jar
+	Client HTTPClient
+)
 
 func init() {
-	jar, _ := cookiejar.New(nil)
+	jar, _ = cookiejar.New(nil)
 	Client = &http.Client{
 		Jar:     jar,
 		Timeout: 15 * time.Second,
 	}
+}
+
+func SetCookie(name, value, path, domain, forUrl string) {
+	u, _ := url.Parse(forUrl)
+	jar.SetCookies(u, []*http.Cookie{
+		{
+			Name:   name,
+			Value:  value,
+			Path:   path,
+			Domain: domain,
+		},
+	})
 }
 
 // DownloadWebpage downloads a webpage and returns content as byte array if successful. An error is returned

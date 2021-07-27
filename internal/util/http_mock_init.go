@@ -43,5 +43,11 @@ func init() {
 		panic(err)
 	}
 
+	ResponseYahooSearch, err = ioutil.ReadFile("testdata/yahoo_images_search")
+
+	if err != nil {
+		panic(err)
+	}
+
 	RegisterMockHTTPClient()
 }
