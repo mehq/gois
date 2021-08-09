@@ -19,7 +19,7 @@ func Execute() {
 `)
 	c.SetHelpCommand(&cobra.Command{Hidden: true})
 
-	c.AddCommand(newBingCmd(), newFlickrCmd(), newGoogleCmd(), newYahooCmd())
+	c.AddCommand(newBingCmd(), newFlickrCmd(), newGoogleCmd(), newYahooCmd(), newYandexCmd())
 
 	if err := c.Execute(); err != nil {
 		os.Exit(1)

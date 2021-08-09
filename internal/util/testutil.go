@@ -40,6 +40,7 @@ var (
 	ResponseFlickrSearchAPI  []byte
 	ResponseGoogleSearch     []byte
 	ResponseYahooSearch      []byte
+	ResponseYandexSearch     []byte
 )
 
 // MockClient is the mock client.
@@ -80,6 +81,8 @@ func RegisterMockHTTPClient() {
 				body = ioutil.NopCloser(bytes.NewReader(ResponseGoogleSearch))
 			case strings.HasPrefix(url, "https://images.search.yahoo.com/search/images"):
 				body = ioutil.NopCloser(bytes.NewReader(ResponseYahooSearch))
+			case strings.HasPrefix(url, "https://yandex.com/images/search"):
+				body = ioutil.NopCloser(bytes.NewReader(ResponseYandexSearch))
 			}
 
 			return &http.Response{

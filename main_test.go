@@ -60,6 +60,10 @@ func TestGois(t *testing.T) {
 			In:  []string{"yahoo", "cats"},
 			Out: nil,
 		},
+		{
+			In:  []string{"yandex", "cats"},
+			Out: nil,
+		},
 	}
 
 	for _, test := range testCases {
@@ -88,6 +92,10 @@ func TestGois_Compact(t *testing.T) {
 		},
 		{
 			In:  []string{"yahoo", "-c", "cats"},
+			Out: nil,
+		},
+		{
+			In:  []string{"yandex", "-c", "cats"},
 			Out: nil,
 		},
 	}

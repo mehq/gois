@@ -49,5 +49,11 @@ func init() {
 		panic(err)
 	}
 
+	ResponseYandexSearch, err = ioutil.ReadFile("testdata/yandex_images_search")
+
+	if err != nil {
+		panic(err)
+	}
+
 	RegisterMockHTTPClient()
 }
