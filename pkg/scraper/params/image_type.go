@@ -3,6 +3,7 @@ package params
 const (
 	ImageTypeAnimated            = "animated"
 	ImageTypeClipArt             = "clip-art"
+	ImageTypeDemotivational      = "demotivational"
 	ImageTypeFace                = "face"
 	ImageTypeGraphic             = "graphic"
 	ImageTypeLineDrawing         = "line-drawing"

@@ -21,10 +21,6 @@ func init() {
 		panic(err)
 	}
 
-	ResponseBingSettings = []byte("dummy response")
-
-	ResponseExample = []byte("dummy response")
-
 	ResponseFlickrSearch, err = ioutil.ReadFile("testdata/flickr_search")
 
 	if err != nil {
@@ -50,6 +46,12 @@ func init() {
 	}
 
 	ResponseYandexSearch, err = ioutil.ReadFile("testdata/yandex_images_search")
+
+	if err != nil {
+		panic(err)
+	}
+
+	ResponseYandexSearchRaw, err = ioutil.ReadFile("testdata/yandex_images_search_raw")
 
 	if err != nil {
 		panic(err)

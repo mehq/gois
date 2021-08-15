@@ -34,13 +34,12 @@ func CheckCmdOutput(t *testing.T, output []byte, matchWith *regexp.Regexp) {
 var (
 	ResponseBingImageAsync   []byte
 	ResponseBingImagesSearch []byte
-	ResponseBingSettings     []byte
-	ResponseExample          []byte
 	ResponseFlickrSearch     []byte
 	ResponseFlickrSearchAPI  []byte
 	ResponseGoogleSearch     []byte
 	ResponseYahooSearch      []byte
 	ResponseYandexSearch     []byte
+	ResponseYandexSearchRaw  []byte
 )
 
 // MockClient is the mock client.
@@ -69,10 +68,6 @@ func RegisterMockHTTPClient() {
 				body = ioutil.NopCloser(bytes.NewReader(ResponseBingImageAsync))
 			case strings.HasPrefix(url, "https://www.bing.com/images/search"):
 				body = ioutil.NopCloser(bytes.NewReader(ResponseBingImagesSearch))
-			case strings.HasPrefix(url, "https://www.bing.com/settings.aspx"):
-				body = ioutil.NopCloser(bytes.NewReader(ResponseBingSettings))
-			case strings.HasPrefix(url, "https://www.example.com"):
-				body = ioutil.NopCloser(bytes.NewReader(ResponseExample))
 			case strings.HasPrefix(url, "https://www.flickr.com/search"):
 				body = ioutil.NopCloser(bytes.NewReader(ResponseFlickrSearch))
 			case strings.HasPrefix(url, "https://api.flickr.com/services/rest"):
@@ -82,7 +77,13 @@ func RegisterMockHTTPClient() {
 			case strings.HasPrefix(url, "https://images.search.yahoo.com/search/images"):
 				body = ioutil.NopCloser(bytes.NewReader(ResponseYahooSearch))
 			case strings.HasPrefix(url, "https://yandex.com/images/search"):
-				body = ioutil.NopCloser(bytes.NewReader(ResponseYandexSearch))
+				if _, exists := req.URL.Query()["format"]; exists {
+					body = ioutil.NopCloser(bytes.NewReader(ResponseYandexSearch))
+				} else {
+					body = ioutil.NopCloser(bytes.NewReader(ResponseYandexSearchRaw))
+				}
+			default:
+				body = ioutil.NopCloser(bytes.NewReader([]byte("dummy response")))
 			}
 
 			return &http.Response{
