@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/mzbaulhaque/gois/cmd"
+	"github.com/mehq/gois/cmd"
 )
 
 func main() {

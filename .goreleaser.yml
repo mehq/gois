@@ -28,8 +28,8 @@ builds:
       - -trimpath
     ldflags:
       - -s -w
-      - -X github.com/mzbaulhaque/gois/internal/build.ProjectName={{.ProjectName}}
-      - -X github.com/mzbaulhaque/gois/internal/build.Version={{.Version}}
+      - -X github.com/mehq/gois/internal/build.ProjectName={{.ProjectName}}
+      - -X github.com/mehq/gois/internal/build.Version={{.Version}}
 
 archives:
   - name_template: '{{.ProjectName}}_{{.Version}}_{{.Os}}_{{.Arch}}{{ if .Arm }}v{{ .Arm }}{{ end }}'

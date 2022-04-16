@@ -1,14 +1,14 @@
 # gois
 
-[![CI](https://github.com/mzbaulhaque/gois/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/mzbaulhaque/gois/actions/workflows/test.yml)
-[![codecov](https://codecov.io/gh/mzbaulhaque/gois/branch/master/graph/badge.svg)](https://codecov.io/gh/mzbaulhaque/gois)
-[![Go Report Card](https://goreportcard.com/badge/github.com/mzbaulhaque/gois)](https://goreportcard.com/report/github.com/mzbaulhaque/gois)
+[![CI](https://github.com/mehq/gois/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/mehq/gois/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/mehq/gois/branch/master/graph/badge.svg)](https://codecov.io/gh/mehq/gois)
+[![Go Report Card](https://goreportcard.com/badge/github.com/mehq/gois)](https://goreportcard.com/report/github.com/mehq/gois)
 
 **gois** is a command line program to search images from popular services like google, bing.
 
 ## Installation
 
-You can download the binaries directly from the [releases](https://github.com/mzbaulhaque/gois/releases) section.
+You can download the binaries directly from the [releases](https://github.com/mehq/gois/releases) section.
 
 ## Usage
 

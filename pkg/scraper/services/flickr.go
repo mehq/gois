@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/mzbaulhaque/gois/internal/util"
-	"github.com/mzbaulhaque/gois/pkg/scraper/params"
+	"github.com/mehq/gois/internal/util"
+	"github.com/mehq/gois/pkg/scraper/params"
 )
 
 // FlickrConfig is a set of options used by FlickrScraper to perform/filter/format search results.

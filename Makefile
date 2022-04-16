@@ -23,7 +23,7 @@ deps: ## Ensures fresh go.mod and go.sum.
 
 fmt: ## Format code
 	@gofmt -w .
-	@goimports -local github.com/mzbaulhaque/gois -w .
+	@goimports -local github.com/mehq/gois -w .
 
 help: ## Show this help
 	@echo 'Usage: make [target]'

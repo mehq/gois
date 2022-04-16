@@ -10,8 +10,8 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 
-	"github.com/mzbaulhaque/gois/internal/util"
-	"github.com/mzbaulhaque/gois/pkg/scraper/params"
+	"github.com/mehq/gois/internal/util"
+	"github.com/mehq/gois/pkg/scraper/params"
 )
 
 // GoogleConfig is a set of options used by GoogleScraper to perform/filter/format search results.

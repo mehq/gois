@@ -11,7 +11,7 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/mzbaulhaque/gois/internal/util"
+	"github.com/mehq/gois/internal/util"
 )
 
 const (

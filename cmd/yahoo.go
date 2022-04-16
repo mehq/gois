@@ -5,9 +5,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/mzbaulhaque/gois/internal/util"
-	"github.com/mzbaulhaque/gois/pkg/scraper/params"
-	"github.com/mzbaulhaque/gois/pkg/scraper/services"
+	"github.com/mehq/gois/internal/util"
+	"github.com/mehq/gois/pkg/scraper/params"
+	"github.com/mehq/gois/pkg/scraper/services"
 )
 
 func newYahooCmd() *cobra.Command {

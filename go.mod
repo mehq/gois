@@ -1,4 +1,4 @@
-module github.com/mzbaulhaque/gois
+module github.com/mehq/gois
 
 go 1.16
 
